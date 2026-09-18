@@ -1,23 +1,17 @@
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 32 32"
-        fill="none"
-        aria-hidden="true"
-      >
-        <rect width="32" height="32" rx="8" fill="#000" />
-        <path
-          d="M9 12.5c0-1.38 1.12-2.5 2.5-2.5h9c1.38 0 2.5 1.12 2.5 2.5v6c0 1.38-1.12 2.5-2.5 2.5h-3.2L14 23.2v-2.2H11.5C10.12 21 9 19.88 9 18.5v-6Z"
-          fill="#fff"
-        />
-        <circle cx="13.2" cy="15.5" r="1" fill="#000" />
-        <circle cx="16" cy="15.5" r="1" fill="#000" />
-        <circle cx="18.8" cy="15.5" r="1" fill="#000" />
-      </svg>
-      <span className="font-display text-[17px] font-semibold tracking-[-0.32px]">
+    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+      <span className="flex size-7 items-center justify-center rounded-md bg-ink text-white">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+          <path
+            d="M2.2 3.4c0-.8.6-1.4 1.4-1.4h7c.8 0 1.4.6 1.4 1.4v5.2c0 .8-.6 1.4-1.4 1.4H6.2L3.4 12V10h-.8c-.8 0-1.4-.6-1.4-1.4V3.4z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+      <span className="font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">
         Aria
       </span>
     </span>

@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
-export function WaitlistForm() {
+export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -13,7 +13,7 @@ export function WaitlistForm() {
   if (submitted) {
     return (
       <p className="text-[15px] font-medium tracking-[-0.16px] text-ink">
-        Du bist auf der Liste. Wir schreiben dir, sobald Aria startet.
+        Danke. Wir schalten Pro für diese Adresse frei.
       </p>
     );
   }
@@ -21,7 +21,7 @@ export function WaitlistForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full max-w-md flex-col gap-2 sm:flex-row"
+      className={`flex w-full flex-col gap-2 ${stacked ? "" : "max-w-md sm:flex-row"}`}
     >
       <label className="sr-only" htmlFor="waitlist-email">
         E-Mail
@@ -36,9 +36,11 @@ export function WaitlistForm() {
       />
       <button
         type="submit"
-        className="inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-ink px-4 text-[15px] font-medium tracking-[-0.16px] text-white hover:bg-ink-soft"
+        className={`inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-ink px-4 text-[15px] font-medium tracking-[-0.16px] text-white hover:bg-ink-soft ${
+          stacked ? "w-full" : "w-full sm:w-auto"
+        }`}
       >
-        Zugang sichern
+        Pro starten
       </button>
     </form>
   );

@@ -10,27 +10,22 @@
   --color-background: #ffffff;
   --color-foreground: #000000;
   --color-ink: #000000;
-  --color-ink-soft: #242629;
-  --color-body: #5c5e63;
-  --color-muted: #75777c;
-  --color-muted-soft: #9fa1a7;
-  --color-hairline: #e4e7ec;
-  --color-hairline-soft: #eeeff1;
-  --color-border: #cad0d9;
-  --color-surface-faint: #fafafb;
-  --color-surface-soft: #f4f5f6;
-  --color-surface-tint: #edeff3;
-  --color-surface-strong: #e6e7ea;
+  --color-ink-soft: #1a1a1a;
+  --color-body: #5c5c5c;
+  --color-muted: #8a8a8a;
+  --color-muted-soft: #a3a3a3;
+  --color-hairline: #e8e8e8;
+  --color-hairline-soft: #efefef;
+  --color-surface: #ffffff;
+  --color-surface-faint: #f7f7f7;
+  --color-surface-soft: #f3f3f3;
   --color-canvas: #ffffff;
-  --color-accent: #266df0;
-  --color-success: #0fc27b;
+  --color-success: #16a34a;
   --font-sans: var(--font-inter);
   --font-display: var(--font-inter-tight);
-  --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 12px;
-  --radius-xl: 14px;
 }
 
 html {
@@ -44,20 +39,19 @@ body {
 }
 
 .hero-wash {
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(246, 247, 251, 0.9) 100%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(36, 38, 41, 0.035) 0,
-      rgba(36, 38, 41, 0.035) 1px,
-      transparent 1px,
-      transparent 72px
-    );
+  background:
+    radial-gradient(920px 420px at 50% -80px, #f4f4f4, transparent 70%),
+    #ffffff;
 }
 
-.product-shadow {
-  box-shadow:
-    0 0 0 1px #eeeff1,
-    rgba(28, 40, 64, 0.08) 0 10.85px 21.7px -4.34px,
-    rgba(28, 40, 64, 0.04) 0 2px 8px;
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    box-shadow: none;
+  }
 }

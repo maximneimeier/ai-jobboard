@@ -1,8 +1,8 @@
 # Aria
 
-Jobsuche im Gespräch. Aria ist ein Next.js-Jobboard: Nutzer beschreiben, was sie suchen — wie in ChatGPT — und bekommen präzise gefilterte Treffer mit Begründung.
+Jobsuche im Gespräch. Nutzer beschreiben, was sie suchen. Aria filtert danach und zeigt Treffer mit Begründung.
 
-Aktuell gibt es nur die Landing Page (Light Mode, Stil angelehnt an Attio).
+Die Landing Page (Light Mode) enthält die Live-Suche. Nach fünf Anfragen erscheint Aria Pro.
 
 ## Starten
 

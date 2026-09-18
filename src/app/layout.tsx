@@ -15,9 +15,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Aria — Jobsuche, die dich versteht",
+  title: "Aria | Finde den Job, der wirklich zu dir passt",
   description:
-    "Finde Jobs im Gespräch. Aria versteht deine Anforderungen, filtert präzise und zeigt Treffer mit Begründung — nicht nur nach Keywords.",
+    "Schreib, was du suchst. Aria liest Anforderungen und zeigt Stellen mit Begründung.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       className={`${inter.variable} ${interTight.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-canvas font-sans text-ink">{children}</body>
+      <body className="min-h-full bg-surface font-sans text-ink">{children}</body>
     </html>
   );
 }

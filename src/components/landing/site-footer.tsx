@@ -1,55 +1,60 @@
 import { Logo } from "./logo";
 
-const columns = [
-  {
-    title: "Produkt",
-    links: ["Chat-Suche", "Filter", "Treffer", "Frühzugang"],
-  },
-  {
-    title: "Unternehmen",
-    links: ["Über Aria", "Karriere", "Presse"],
-  },
-  {
-    title: "Rechtliches",
-    links: ["Impressum", "Datenschutz", "AGB"],
-  },
+const links = [
+  { href: "/#suche", label: "Jobs" },
+  { href: "/#arbeitgeber", label: "Arbeitgeber" },
+  { href: "/gemerkt", label: "Gemerkt" },
+  { href: "/profil", label: "Profil" },
+  { href: "/#preise", label: "Preise" },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-hairline-soft bg-surface-faint">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-16 md:grid-cols-4 md:px-8">
+    <footer className="border-t border-hairline-soft bg-canvas">
+      <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-12 px-5 py-12 md:flex-row md:items-start md:justify-between md:px-8">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs text-[14px] leading-6 text-body">
-            Jobsuche im Gespräch. Anforderungen verstehen, präzise filtern,
-            bessere Treffer.
+          <p className="mt-3 max-w-[34ch] text-[14px] leading-6 text-body">
+            Die Jobsuche, die Anforderungen versteht. Ein Produkt von{" "}
+            <a
+              href="https://atheniks.com/de/"
+              className="font-medium text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink"
+            >
+              Atheniks
+            </a>
+            {". "}
           </p>
         </div>
-        {columns.map((column) => (
-          <div key={column.title}>
-            <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-              {column.title}
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {column.links.map((link) => (
-                <li key={link}>
-                  <a
-                    href="#start"
-                    className="text-[14px] text-ink-soft hover:text-ink"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
+            Aria
+          </p>
+          <ul className="mt-4 space-y-2.5">
+            {links.map((link) => (
+              <li key={link.label}>
+                <a href={link.href} className="text-[14px] text-ink-soft hover:text-ink">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="border-t border-hairline-soft">
-        <p className="mx-auto max-w-[1440px] px-5 py-5 text-[13px] text-muted md:px-8">
-          © {new Date().getFullYear()} Aria. Alle Rechte vorbehalten.
-        </p>
+        <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-3 px-5 py-5 text-[13px] text-muted md:flex-row md:items-center md:justify-between md:px-8">
+          <p>© {new Date().getFullYear()} Atheniks. Alle Rechte vorbehalten.</p>
+          <div className="flex flex-wrap gap-5">
+            <a href="https://atheniks.com/de/impressum/" className="hover:text-ink">
+              Impressum
+            </a>
+            <a href="https://atheniks.com/de/datenschutz/" className="hover:text-ink">
+              Datenschutz
+            </a>
+            <a href="https://atheniks.com/de/agb/" className="hover:text-ink">
+              AGB
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );
