@@ -8,10 +8,10 @@ import { ProfileMenu } from "./profile-menu";
 import { SavedJobsButton } from "./saved-jobs-button";
 
 const links = [
-  { href: "/#suche", label: "Jobs" },
-  { href: "/#arbeitgeber", label: "Arbeitgeber" },
+  { href: "/search#suche", label: "Jobs" },
+  { href: "/search#arbeitgeber", label: "Arbeitgeber" },
   { href: "/gemerkt", label: "Gemerkt" },
-  { href: "/#preise", label: "Preise" },
+  { href: "/#early-access", label: "Early Access" },
 ];
 
 export function SiteNav() {
@@ -57,7 +57,7 @@ export function SiteNav() {
         <div className="hidden items-center gap-2 lg:flex">
           <ProfileMenu />
           <Link
-            href="/#suche"
+            href="/search#suche"
             className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
           >
             Jetzt suchen

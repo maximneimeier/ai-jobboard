@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ProfilRoute() {
   return (
-    <div className="flex min-h-full flex-col bg-canvas">
+    <div lang="de" className="flex min-h-full flex-col bg-canvas">
       <SiteNav />
       <main className="flex flex-1 flex-col">
         <ProfilePage />

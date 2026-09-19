@@ -1,11 +1,11 @@
 import { Logo } from "./logo";
 
 const links = [
-  { href: "/#suche", label: "Jobs" },
-  { href: "/#arbeitgeber", label: "Arbeitgeber" },
+  { href: "/search#suche", label: "Jobs" },
+  { href: "/search#arbeitgeber", label: "Arbeitgeber" },
   { href: "/gemerkt", label: "Gemerkt" },
   { href: "/profil", label: "Profil" },
-  { href: "/#preise", label: "Preise" },
+  { href: "/#early-access", label: "Early Access" },
 ];
 
 export function SiteFooter() {

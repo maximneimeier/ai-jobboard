@@ -52,7 +52,7 @@ export function SavedJobsList() {
               Merken.
             </p>
             <Link
-              href="/#suche"
+              href="/search#suche"
               className="mt-5 inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] font-medium tracking-[-0.16px] text-white"
             >
               Zur Suche

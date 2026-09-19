@@ -14,7 +14,7 @@ export default async function ApplicationRoute({
   const { id } = await params;
 
   return (
-    <div className="flex min-h-full flex-col bg-canvas">
+    <div lang="de" className="flex min-h-full flex-col bg-canvas">
       <SiteNav />
       <main className="flex flex-1 flex-col">
         <ApplicationEditor jobId={id} />
