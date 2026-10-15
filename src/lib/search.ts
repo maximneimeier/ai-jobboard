@@ -277,7 +277,7 @@ export function criteriaChips(criteria: Criteria): string[] {
   return unique(chips);
 }
 
-function criteriaHasSignal(criteria: Criteria) {
+export function criteriaHasSignal(criteria: Criteria) {
   return (
     criteria.functions.length +
       criteria.cities.length +
@@ -297,14 +297,34 @@ function criteriaHasSignal(criteria: Criteria) {
   );
 }
 
-export function rankJobs(criteria: Criteria): RankedJob[] {
+export function rankJobs(criteria: Criteria, limit = 8): RankedJob[] {
   const hasAny = criteriaHasSignal(criteria);
 
   const ranked = JOBS.map((job) => scoreJob(job, criteria, hasAny)).sort(
     (a, b) => b.match - a.match,
   );
 
-  return hasAny ? ranked.filter((job) => job.match >= 45).slice(0, 8) : [];
+  return hasAny ? ranked.filter((job) => job.match >= 45).slice(0, limit) : [];
+}
+
+export function recommendJobs(
+  criteria: Criteria,
+  excludeIds: Iterable<string> = [],
+  limit = 12,
+): RankedJob[] {
+  const excluded = new Set(excludeIds);
+  const hasAny = criteriaHasSignal(criteria);
+  const ranked = JOBS.map((job) => scoreJob(job, criteria, hasAny)).sort(
+    (a, b) => b.match - a.match,
+  );
+  const remaining = ranked.filter((job) => !excluded.has(job.id));
+  if (!hasAny) return remaining.slice(0, limit);
+  let pool = remaining.filter((job) => job.match >= 45);
+  if (criteria.functions.length) {
+    const sameFn = pool.filter((job) => criteria.functions.includes(job.fn));
+    if (sameFn.length) pool = sameFn;
+  }
+  return (pool.length ? pool : remaining).slice(0, limit);
 }
 
 function scoreJob(job: Job, criteria: Criteria, hasAny: boolean): RankedJob {
@@ -473,8 +493,8 @@ function scoreJob(job: Job, criteria: Criteria, hasAny: boolean): RankedJob {
     match,
     why: fits.length ? `Passt: ${fits.slice(0, 3).join(", ")}.` : job.summary,
     gap: gaps[0],
-    fits,
-    gaps,
+    fits: unique(fits),
+    gaps: unique(gaps),
     responsibilityChecks: annotateLines(job.responsibilities, criteria, job),
     requirementChecks: annotateLines(job.requirements, criteria, job),
   };

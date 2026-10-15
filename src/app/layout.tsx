@@ -15,18 +15,18 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Aria | Finde den Job, der wirklich zu dir passt",
+  title: "Atheniks | Find a job that actually fits you",
   description:
-    "Schreib, was du suchst. Aria liest Anforderungen und zeigt Stellen mit Begründung.",
+    "Less searching. Better opportunities. Discover relevant jobs, understand your fit, and start without an account.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="de"
+      lang="en"
       className={`${inter.variable} ${interTight.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-surface font-sans text-ink">{children}</body>
+      <body className="min-h-full bg-canvas font-sans text-ink">{children}</body>
     </html>
   );
 }

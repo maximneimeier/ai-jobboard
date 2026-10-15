@@ -37,7 +37,7 @@ export function ChatNav({
           className="rounded-md"
           aria-label="Zur Startseite"
         >
-          <Logo />
+          <Logo compact />
         </button>
       </div>
 

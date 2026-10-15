@@ -1,11 +1,11 @@
 import { Logo } from "./logo";
 
 const links = [
-  { href: "/#suche", label: "Jobs" },
-  { href: "/#arbeitgeber", label: "Arbeitgeber" },
-  { href: "/gemerkt", label: "Gemerkt" },
-  { href: "/profil", label: "Profil" },
-  { href: "/#preise", label: "Preise" },
+  { href: "/jobs", label: "Jobs" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/gemerkt", label: "Saved" },
+  { href: "/konto", label: "Account" },
+  { href: "/#pricing", label: "Pricing" },
 ];
 
 export function SiteFooter() {
@@ -15,7 +15,7 @@ export function SiteFooter() {
         <div>
           <Logo />
           <p className="mt-3 max-w-[34ch] text-[14px] leading-6 text-body">
-            Die Jobsuche, die Anforderungen versteht. Ein Produkt von{" "}
+            Job search that understands the role. A product by{" "}
             <a
               href="https://atheniks.com/de/"
               className="font-medium text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink"
@@ -27,7 +27,7 @@ export function SiteFooter() {
         </div>
         <div>
           <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-            Aria
+            Career Copilot
           </p>
           <ul className="mt-4 space-y-2.5">
             {links.map((link) => (
@@ -42,16 +42,16 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-hairline-soft">
         <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-3 px-5 py-5 text-[13px] text-muted md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© {new Date().getFullYear()} Atheniks. Alle Rechte vorbehalten.</p>
+          <p suppressHydrationWarning>© 2026 Atheniks. All rights reserved.</p>
           <div className="flex flex-wrap gap-5">
             <a href="https://atheniks.com/de/impressum/" className="hover:text-ink">
-              Impressum
+              Legal notice
             </a>
             <a href="https://atheniks.com/de/datenschutz/" className="hover:text-ink">
-              Datenschutz
+              Privacy
             </a>
             <a href="https://atheniks.com/de/agb/" className="hover:text-ink">
-              AGB
+              Terms
             </a>
           </div>
         </div>

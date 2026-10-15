@@ -2,38 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CHAT_OPEN_EVENT } from "@/lib/chats";
+import { useDemo } from "@/lib/demo/store";
 import { Logo } from "./logo";
-import { ProfileMenu } from "./profile-menu";
-import { SavedJobsButton } from "./saved-jobs-button";
-
-const links = [
-  { href: "/#suche", label: "Jobs" },
-  { href: "/#arbeitgeber", label: "Arbeitgeber" },
-  { href: "/gemerkt", label: "Gemerkt" },
-  { href: "/#preise", label: "Preise" },
-];
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-
+  const [ready, setReady] = useState(false);
+  const demo = useDemo();
   useEffect(() => {
-    function onChat(event: Event) {
-      setChatOpen(Boolean((event as CustomEvent).detail));
-    }
-    window.addEventListener(CHAT_OPEN_EVENT, onChat);
-    return () => window.removeEventListener(CHAT_OPEN_EVENT, onChat);
+    setReady(true);
   }, []);
-
-  if (chatOpen) {
-    return (
-      <header
-        className="pointer-events-none invisible sticky top-0 z-40 h-16 md:h-[72px]"
-        aria-hidden
-      />
-    );
-  }
+  const signedUp = ready && demo.signedUp;
+  const saved = ready ? demo.savedIds.length : 0;
+  const links = [
+    { href: "/jobs", label: "Jobs" },
+    { href: "/#how-it-works", label: "How it works" },
+    { href: "/konto/gemerkt", label: "Saved" },
+    { href: "/#pricing", label: "Pricing" },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-hairline-soft bg-surface/90 backdrop-blur-md">
@@ -50,49 +36,58 @@ export function SiteNav() {
               className="text-[14px] font-medium tracking-[-0.16px] text-ink"
             >
               {link.label}
+              {link.label === "Saved" && saved ? (
+                <span className="ml-1.5 rounded-md bg-surface-soft px-1.5 text-[11px]">
+                  {saved}
+                </span>
+              ) : null}
             </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <ProfileMenu />
-          <Link
-            href="/#suche"
-            className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
-          >
-            Jetzt suchen
-          </Link>
+          {signedUp ? (
+            <Link
+              href="/konto"
+              className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
+            >
+              Account
+            </Link>
+          ) : (
+            <Link
+              href="/onboarding"
+              className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
+            >
+              Create your profile
+            </Link>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
-          <SavedJobsButton compact />
-          <ProfileMenu compact />
-          <button
-            type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md ring-1 ring-hairline"
-            aria-label={open ? "Menü schließen" : "Menü öffnen"}
-            aria-expanded={open}
-            onClick={() => setOpen((value) => !value)}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              {open ? (
-                <path
-                  d="M3.5 3.5l9 9M12.5 3.5l-9 9"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              ) : (
-                <path
-                  d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              )}
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md ring-1 ring-hairline lg:hidden"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            {open ? (
+              <path
+                d="M3.5 3.5l9 9M12.5 3.5l-9 9"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            ) : (
+              <path
+                d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            )}
+          </svg>
+        </button>
       </div>
 
       {open ? (
@@ -108,6 +103,13 @@ export function SiteNav() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href={signedUp ? "/konto" : "/onboarding"}
+              className="text-[14px] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              {signedUp ? "Account" : "Create your profile"}
+            </Link>
           </nav>
         </div>
       ) : null}

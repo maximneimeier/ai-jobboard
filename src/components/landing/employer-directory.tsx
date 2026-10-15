@@ -41,22 +41,22 @@ export function EmployerDirectory() {
   const fromSearch = location.cities.length > 0 || location.remote || location.dach;
   const headline =
     filter === "all"
-      ? "Entdecke Teams"
+      ? "Discover teams"
       : filter === "Remote"
-        ? "Teams remote"
+        ? "Remote teams"
         : `Teams in ${filter}`;
   const subtitle = override
-    ? "Standort über die Filter gewählt."
+    ? "Location chosen from the filters."
     : fromSearch
-      ? "Passend zum Standort aus deiner Suche."
-      : "Ohne Suche zeigen wir Teams in Berlin.";
+      ? "Matched to the location from your search."
+      : "Without a search we show teams in Berlin.";
 
   return (
     <div className="mx-auto max-w-[1080px] px-5 md:px-8">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-            Arbeitgeber
+            Employers
           </p>
           <h2 className="font-display mt-2 text-[32px] leading-[1.15] font-semibold tracking-[-0.32px] md:text-[40px]">
             {headline}
@@ -72,7 +72,7 @@ export function EmployerDirectory() {
               : "text-[15px] font-medium tracking-[-0.16px] text-muted"
           }
         >
-          Alle Firmen
+          All companies
         </button>
       </div>
 
@@ -105,7 +105,7 @@ export function EmployerDirectory() {
             </h3>
             <p className="mt-1 text-[14px] text-body">{company.field}</p>
             <p className="mt-1 text-[13px] text-muted">
-              {company.cities.join(" · ")} · {company.size} Mitarbeitende
+              {company.cities.join(" · ")} · {company.size} employees
             </p>
             <p className="mt-4 text-[14px] font-medium text-ink">
               {company.jobs} {company.jobs === 1 ? "Job" : "Jobs"}
@@ -114,13 +114,13 @@ export function EmployerDirectory() {
         ))}
         {companies.length === 0 ? (
           <p className="text-[14px] text-body sm:col-span-2 lg:col-span-3">
-            Keine Firmen für diesen Standort.{" "}
+            No companies for this location.{" "}
             <button
               type="button"
               onClick={() => setOverride("all")}
               className="font-medium text-ink"
             >
-              Alle {COMPANIES.length} Firmen zeigen
+              Show all {COMPANIES.length} companies
             </button>
           </p>
         ) : null}

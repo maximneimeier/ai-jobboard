@@ -533,7 +533,9 @@ export function ProfileEditor({
 
       {chips.length ? (
         <div>
-          <p className="text-[12px] font-medium text-ink">So liest Aria das Profil</p>
+          <p className="text-[12px] font-medium text-ink">
+            So liest Career Copilot das Profil
+          </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {chips.map((chip) => (
               <span

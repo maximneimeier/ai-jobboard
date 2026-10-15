@@ -4,8 +4,8 @@ import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteNav } from "@/components/landing/site-nav";
 
 export const metadata: Metadata = {
-  title: "Bewerbung | Aria",
-  description: "Lebenslauf und Anschreiben zur gemerkten Stelle.",
+  title: "Application | Atheniks Career Copilot",
+  description: "Resume and cover letter for a saved job.",
 };
 
 export default async function ApplicationRoute({

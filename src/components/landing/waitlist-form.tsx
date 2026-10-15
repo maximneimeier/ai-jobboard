@@ -13,7 +13,7 @@ export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
   if (submitted) {
     return (
       <p className="text-[15px] font-medium tracking-[-0.16px] text-ink">
-        Danke. Wir schalten Pro für diese Adresse frei.
+        Thanks. We will open Pro for this address.
       </p>
     );
   }
@@ -24,23 +24,23 @@ export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
       className={`flex w-full flex-col gap-2 ${stacked ? "" : "max-w-md sm:flex-row"}`}
     >
       <label className="sr-only" htmlFor="waitlist-email">
-        E-Mail
+        Email
       </label>
       <input
         id="waitlist-email"
         name="email"
         type="email"
         required
-        placeholder="E-Mail-Adresse"
-        className="h-11 w-full rounded-md bg-canvas px-3.5 text-[15px] tracking-[-0.16px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft focus:ring-ink"
+        placeholder="Email address"
+        className="h-11 w-full rounded-xl bg-canvas px-3.5 text-[15px] tracking-[-0.16px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft focus:ring-2 focus:ring-accent"
       />
       <button
         type="submit"
-        className={`inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-ink px-4 text-[15px] font-medium tracking-[-0.16px] text-white hover:bg-ink-soft ${
+        className={`inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-accent px-4 text-[15px] font-medium tracking-[-0.16px] text-white transition hover:bg-accent-hover ${
           stacked ? "w-full" : "w-full sm:w-auto"
         }`}
       >
-        Pro starten
+        Join the list
       </button>
     </form>
   );

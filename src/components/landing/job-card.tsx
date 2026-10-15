@@ -98,9 +98,11 @@ export function JobCard({
                 {savedJobStatusLabel(saved.status)}
               </span>
             ) : null}
-            <span className="rounded-md bg-[#eaf8f2] px-1.5 py-0.5 text-[12px] font-medium text-success">
-              {job.match}%
-            </span>
+            {job.match > 0 ? (
+              <span className="rounded-md bg-[#eaf8f2] px-1.5 py-0.5 text-[12px] font-medium text-success">
+                {job.match}%
+              </span>
+            ) : null}
             <Chevron open={open} />
           </span>
         </div>

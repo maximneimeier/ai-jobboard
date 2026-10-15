@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { SavedJobsList } from "@/components/landing/saved-jobs-list";
+import { SavedBoard } from "@/components/demo/saved-board";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteNav } from "@/components/landing/site-nav";
 
 export const metadata: Metadata = {
-  title: "Gemerkt | Aria",
-  description: "Deine gemerkten Stellen und der Bewerbungsstatus.",
+  title: "Saved | Atheniks Career Copilot",
+  description: "Your saved jobs.",
 };
 
 export default function GemerktPage() {
@@ -13,7 +13,7 @@ export default function GemerktPage() {
     <div className="flex min-h-full flex-col bg-canvas">
       <SiteNav />
       <main className="flex flex-1 flex-col">
-        <SavedJobsList />
+        <SavedBoard />
       </main>
       <SiteFooter />
     </div>

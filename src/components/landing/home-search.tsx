@@ -37,8 +37,10 @@ import {
 import {
   EMPTY_CRITERIA,
   criteriaChips,
+  criteriaHasSignal,
   mergeCriteria,
   rankJobs,
+  recommendJobs,
   replyFor,
   type Criteria,
   type RankedJob,
@@ -50,21 +52,6 @@ import { markJobsSeen, readSeenJobIds } from "@/lib/seen-jobs";
 const FREE_QUERIES = 5;
 const STORAGE_KEY = "aria.queryCount";
 const COUNT_EVENT = "aria-query-count";
-
-const SUGGESTIONS = [
-  {
-    text: "Senior Product Designer in Berlin, hybrid, ab 80k, starkes Design-Team",
-    icon: "design",
-  },
-  {
-    text: "Remote Backend in Go, DACH, ohne Bereitschaft",
-    icon: "code",
-  },
-  {
-    text: "Growth Lead, remote, 4-Tage-Woche, Startup",
-    icon: "growth",
-  },
-];
 
 type Turn = {
   id: string;
@@ -252,7 +239,10 @@ export function HomeSearch() {
   }
 
   function showNewProfileJobs() {
-    const query = "Neue Stellen, die zu meinem Profil passen";
+    startAiMatch("Neue Stellen, die zu meinem Profil passen");
+  }
+
+  function startAiMatch(query = "Finde passende Jobs für mich") {
     turnId.current += 1;
     const id = String(turnId.current);
     chatIdRef.current = null;
@@ -277,7 +267,11 @@ export function HomeSearch() {
     setTurns([{ id, query, reply: "", results: [], chips: [], busy: true }]);
 
     window.setTimeout(() => {
-      const all = rankJobs(baseCriteria);
+      const chips = criteriaChips(baseCriteria);
+      const hasSignal = criteriaHasSignal(baseCriteria);
+      const all = hasSignal
+        ? rankJobs(baseCriteria)
+        : recommendJobs(baseCriteria, [], 8);
       const seen = new Set([
         ...readSeenJobIds(),
         ...readSavedJobs().map((job) => job.id),
@@ -288,13 +282,14 @@ export function HomeSearch() {
       ]);
       const fresh = all.filter((job) => !seen.has(job.id));
       const nextResults = (fresh.length ? fresh : all).slice(0, 8);
-      const chips = criteriaChips(baseCriteria);
       markJobsSeen(nextResults.map((job) => job.id));
       setTurns([
         {
           id,
           query,
-          reply: discoverReply(chips, nextResults, Boolean(fresh.length)),
+          reply: hasSignal
+            ? discoverReply(chips, nextResults, Boolean(fresh.length))
+            : "Ich suche passende Stellen für dich. Sag mir zuerst die Richtung, dann wird der Fit genauer.",
           results: nextResults,
           chips,
           questions: followUpsFor(baseCriteria, nextResults, []),
@@ -483,7 +478,7 @@ export function HomeSearch() {
                     <div>
                       {turn.busy ? (
                         <p className="text-[15px] leading-6 text-body">
-                          Aria sucht passende Rollen…
+                          Career Copilot sucht passende Rollen…
                         </p>
                       ) : (
                         <>
@@ -555,7 +550,7 @@ export function HomeSearch() {
                 className="mx-auto flex w-full max-w-[768px] items-end gap-2 px-5 py-4 md:px-8"
               >
                 <label className="sr-only" htmlFor="job-query">
-                  Nachricht an Aria
+                  Nachricht an Career Copilot
                 </label>
                 <input
                   ref={composerRef}
@@ -598,14 +593,14 @@ export function HomeSearch() {
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-canvas/92 p-5">
                 <div className="w-full max-w-md rounded-lg bg-canvas p-6 ring-1 ring-hairline">
                   <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-                    Aria Pro
+                    Career Copilot Pro
                   </p>
                   <h3 className="font-display mt-3 text-[28px] leading-[1.15] font-semibold tracking-[-0.32px] text-ink">
                     Fünf Suchen sind aufgebraucht.
                   </h3>
                   <p className="mt-3 text-[15px] leading-6 text-body">
                     Unbegrenzt weitersuchen, Profile speichern und direkt bewerben:
-                    Aria Pro für 12 € im Monat.
+                    Career Copilot Pro für 12 € im Monat.
                   </p>
                   {proDone ? (
                     <p className="mt-5 text-[15px] font-medium text-ink">
@@ -647,65 +642,29 @@ export function HomeSearch() {
 
   return (
     <section id="suche" className="hero-wash scroll-mt-[72px]">
-      <div className="relative mx-auto max-w-[920px] px-5 pt-20 pb-12 text-center md:pt-28">
+      <div className="relative mx-auto max-w-[920px] px-5 pt-20 pb-24 text-center md:pt-28 md:pb-32">
         <p className="inline-flex items-center rounded-md bg-surface-soft px-3 py-2 text-[15px] font-medium tracking-[-0.16px] text-ink">
-          Suche in normalen Sätzen
+          Mit KI zum passenden Job
         </p>
         <h1 className="font-display mx-auto mt-7 max-w-[16ch] text-[40px] leading-none font-semibold tracking-[-0.04em] text-ink sm:text-[56px] lg:text-[64px]">
           Finde den Job, der wirklich zu dir passt.
         </h1>
         <p className="mx-auto mt-5 max-w-[46ch] text-[17px] leading-7 text-body">
-          Schreib, was du suchst. Aria liest Anforderungen und zeigt Stellen
-          mit Begründung.
+          Ein Klick, und Career Copilot liest dein Profil und die Anforderungen.
+          Danach siehst du Stellen mit Begründung.
         </p>
-        <form onSubmit={handleSubmit} className="mx-auto mt-8 flex max-w-[640px] items-center gap-2">
-          <label className="sr-only" htmlFor="job-query">
-            Beschreibe deine Wunschrolle
-          </label>
-          <div className="relative min-w-0 flex-1">
-            <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted">
-              <SearchIcon />
-            </span>
-            <input
-              id="job-query"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Beschreibe deine Wunschrolle"
-              disabled={paywallVisible}
-              className="h-12 w-full rounded-md bg-canvas pr-4 pl-11 text-[15px] tracking-[-0.16px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft focus:ring-ink disabled:opacity-70"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={paywallVisible}
-            className="inline-flex size-12 shrink-0 items-center justify-center rounded-md bg-ink text-white disabled:opacity-40"
-            aria-label="Suchen"
-          >
-            <SendIcon />
-          </button>
-        </form>
-      </div>
-
-      <div className="mx-auto max-w-[1080px] px-5 pb-16 md:px-8">
-        <p className="text-[15px] tracking-[-0.16px] text-body">
-          Nicht sicher, was du eingeben sollst? Ein paar Einstiege:
+        <button
+          type="button"
+          onClick={() => startAiMatch()}
+          className="mx-auto mt-8 inline-flex h-12 items-center gap-2.5 rounded-md bg-ink px-5 text-[15px] font-medium tracking-[-0.16px] text-white hover:bg-ink-soft"
+        >
+          <SparkIcon />
+          Passende Jobs finden
+        </button>
+        <p className="mx-auto mt-4 max-w-[40ch] text-[13px] leading-6 text-muted">
+          Fehlt noch etwas im Profil, stellt Career Copilot Rückfragen und schärft
+          die Treffer.
         </p>
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {SUGGESTIONS.map((item) => (
-            <button
-              key={item.text}
-              type="button"
-              onClick={() => runSearch(item.text)}
-              disabled={paywallVisible}
-              className="flex min-h-[132px] flex-col justify-between rounded-lg bg-canvas p-5 text-left ring-1 ring-hairline-soft hover:bg-surface-faint disabled:opacity-50"
-            >
-              <p className="text-[15px] leading-6 tracking-[-0.16px] text-ink">
-                {item.text}
-              </p>
-              <SuggestionIcon name={item.icon} />
-            </button>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -737,15 +696,14 @@ function discoverReply(
   return `Neue Stellen zum Profil: ${chips.join(", ")}. Stärkster neuer Treffer ist ${top.role} bei ${top.company} mit ${top.match}% Fit.${extra}`;
 }
 
-function SearchIcon() {
+function SparkIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <circle cx="8" cy="8" r="5.25" stroke="currentColor" strokeWidth="1.6" />
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path
-        d="M12 12.5L15.5 16"
+        d="M8 1.5l1.1 4.2L13.5 7 9.1 8.3 8 12.5 6.9 8.3 2.5 7l4.4-1.3L8 1.5z"
         stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -765,21 +723,3 @@ function SendIcon() {
   );
 }
 
-function SuggestionIcon({ name }: { name: string }) {
-  const paths: Record<string, string> = {
-    design: "M4 14l6-10 6 10H4z",
-    code: "M7 6L4 9l3 3M11 6l3 3-3 3",
-    growth: "M4 13l4-4 3 3 5-6",
-  };
-  return (
-    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" className="text-muted">
-      <path
-        d={paths[name]}
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}

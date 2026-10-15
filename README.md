@@ -1,14 +1,21 @@
-# Aria
+# Atheniks Career Copilot
 
-Jobsuche im Gespräch. Nutzer beschreiben, was sie suchen. Aria filtert danach und zeigt Treffer mit Begründung.
+Interactive mock of the job search. No backend, no live listings, no real AI.
 
-Die Landing Page (Light Mode) enthält die Live-Suche. Nach fünf Anfragen erscheint Aria Pro.
+## Flow
 
-## Starten
+1. Search a role and city, for example Software Engineer in Berlin.
+2. Filter and sort the demo results.
+3. Optionally personalize with a sample tech profile.
+4. Save a job, create a demo account, and track applications.
+
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Öffne [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
+
+Reset the demo under Settings in the account area.
