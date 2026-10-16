@@ -5,22 +5,16 @@ import { useMemo, useState } from "react";
 import { demoJobById } from "@/lib/demo/jobs";
 import {
   EMPLOYMENT_LABEL,
-  FIT_CLASS,
-  FIT_LABEL,
   LEVEL_LABEL,
-  SEARCH_LABEL,
   WORK_MODE_LABEL,
   matchChecks,
   postedLabel,
   rankDemoJobs,
   salaryLabel,
 } from "@/lib/demo/match";
-import {
-  toggleSave,
-  upsertApplication,
-  useDemo,
-} from "@/lib/demo/store";
-import { DemoBanner } from "./demo-banner";
+import { toggleSave, upsertApplication, useDemo } from "@/lib/demo/store";
+import { MatchBadge } from "./match-badge";
+import { PreparePanel } from "./prepare-panel";
 import { SignupModal } from "./signup-modal";
 import { SkillChecks } from "./skill-checks";
 
@@ -48,6 +42,7 @@ export function JobArticle({ jobId }: { jobId: string }) {
         searchLabel: "similar" as const,
         why: ["Similar role to your current search."],
         consider: ["Open the full posting to confirm the details."],
+        summaryLine: "Similar role to your current search.",
       }
     );
   }, [job, demo]);
@@ -82,15 +77,11 @@ export function JobArticle({ jobId }: { jobId: string }) {
         ← Results
       </Link>
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        {demo.personalized && ranked.fit ? (
-          <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${FIT_CLASS[ranked.fit]}`}>
-            {FIT_LABEL[ranked.fit]}
-          </span>
-        ) : (
-          <span className="rounded-md bg-surface-soft px-2 py-0.5 text-[11px] font-medium">
-            {SEARCH_LABEL[ranked.searchLabel]}
-          </span>
-        )}
+        <MatchBadge
+          fit={ranked.fit}
+          searchLabel={ranked.searchLabel}
+          personalized={demo.personalized}
+        />
         <span className="text-[12px] text-muted">{job.source}</span>
       </div>
       <h1 className="font-display mt-3 text-[36px] leading-[1.1] font-semibold tracking-[-0.04em] text-ink">
@@ -156,7 +147,9 @@ export function JobArticle({ jobId }: { jobId: string }) {
         <section>
           <h2 className="text-[15px] font-medium text-ink">Skills</h2>
           {demo.personalized && demo.profile ? (
-            <SkillChecks checks={matchChecks(job, demo.profile)} />
+            <div className="mt-2">
+              <SkillChecks checks={matchChecks(job, demo.profile)} />
+            </div>
           ) : (
             <p className="mt-2 text-[15px] text-body">{job.skills.join(" · ")}</p>
           )}
@@ -164,11 +157,9 @@ export function JobArticle({ jobId }: { jobId: string }) {
         {demo.personalized ? (
           <section className="rounded-lg bg-surface p-5 ring-1 ring-hairline-soft">
             <h2 className="text-[15px] font-medium text-ink">Fit with your profile</h2>
-            <div className="mt-3">
-              <DemoBanner>
-                Based on your profile, experience, and stated preferences.
-              </DemoBanner>
-            </div>
+            <p className="mt-3 text-[13px] leading-5 text-body">
+              Based on your profile, experience, and stated preferences.
+            </p>
             <p className="mt-4 text-[13px] font-medium text-ink">Why it fits</p>
             <ul className="mt-2 space-y-1 text-[14px] leading-6 text-body">
               {ranked.why.map((item) => (
@@ -217,101 +208,5 @@ export function JobArticle({ jobId }: { jobId: string }) {
         onDone={() => setSignupOpen(false)}
       />
     </article>
-  );
-}
-
-function PreparePanel({
-  jobTitle,
-  jobId,
-  onClose,
-}: {
-  jobTitle: string;
-  jobId: string;
-  onClose: () => void;
-}) {
-  const demo = useDemo();
-  const profile = demo.profile;
-  const [notes, setNotes] = useState(
-    demo.applications.find((item) => item.jobId === jobId)?.notes ?? "",
-  );
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/30 p-4 sm:items-center">
-      <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-lg bg-surface p-6 ring-1 ring-hairline">
-        <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-          Application
-        </p>
-        <h2 className="font-display mt-2 text-[24px] font-semibold text-ink">
-          {jobTitle}
-        </h2>
-        <p className="mt-3 text-[14px] leading-6 text-body">
-          Keep notes, tailor your story, and send when you are ready.
-        </p>
-        {profile ? (
-          <div className="mt-5 rounded-md bg-canvas p-4 ring-1 ring-hairline-soft">
-            <p className="text-[13px] font-medium text-ink">
-              {profile.currentRole} · {profile.years} years
-            </p>
-            <p className="mt-1 text-[13px] text-body">
-              {[...profile.skills, ...profile.abilities].join(" · ")}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-4 text-[13px] text-muted">
-            Without a profile, only the job. Personalization stays optional.
-          </p>
-        )}
-        <div className="mt-5">
-          <p className="text-[13px] font-medium text-ink">CV notes, examples only</p>
-          <ul className="mt-2 space-y-1 text-[14px] leading-6 text-body">
-            <li>· Lead with shipped product work, not a task list.</li>
-            <li>· Two concrete features or systems, with your part in them.</li>
-            <li>· Mention TypeScript or React only with context.</li>
-          </ul>
-        </div>
-        <div className="mt-5">
-          <p className="text-[13px] font-medium text-ink">Checklist</p>
-          <ul className="mt-2 space-y-1 text-[14px] leading-6 text-body">
-            <li>· Hold the listing against your profile</li>
-            <li>· Tailor the note to one gap</li>
-            <li>· Set a follow-up date</li>
-          </ul>
-        </div>
-        <label className="mt-5 grid gap-1 text-[13px] font-medium text-ink">
-          Notes
-          <textarea
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            rows={3}
-            className="rounded-md bg-canvas px-3 py-2 text-[14px] font-normal ring-1 ring-hairline outline-none"
-          />
-        </label>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              upsertApplication(jobId, { status: "preparing", notes });
-              window.location.assign("/konto/bewerbungen");
-            }}
-            className="inline-flex h-10 items-center rounded-md px-4 text-[14px] ring-1 ring-hairline"
-          >
-            Mark as preparing
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              upsertApplication(jobId, { status: "applied", notes });
-              window.location.assign("/konto/bewerbungen");
-            }}
-            className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white"
-          >
-            Mark as applied
-          </button>
-          <button type="button" onClick={onClose} className="h-10 px-3 text-[14px] text-muted">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

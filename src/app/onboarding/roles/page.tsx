@@ -4,8 +4,8 @@ import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteNav } from "@/components/landing/site-nav";
 
 export const metadata: Metadata = {
-  title: "Choose roles | Atheniks Career Copilot",
-  description: "Pick the roles we should match you to.",
+  title: "Job preferences | Atheniks Career Copilot",
+  description: "Choose the roles, places, and filters we should look for.",
 };
 
 export default function RolePickerRoute() {

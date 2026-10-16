@@ -9,7 +9,7 @@ const JOBS = [
     title: "Investment Analyst",
     company: "Northbridge Capital",
     meta: "Munich, Germany · Hybrid",
-    fit: "Strong fit",
+    fit: "Strong match",
     why: [
       "Relevant financial modeling experience",
       "Preferred location",
@@ -22,7 +22,7 @@ const JOBS = [
     title: "Software Engineer",
     company: "Northline",
     meta: "Berlin · Hybrid",
-    fit: "Potential fit",
+    fit: "Good match",
     why: ["TypeScript and React in the stack", "Product-facing engineering"],
     gap: "On-site days may be higher than preferred",
   },

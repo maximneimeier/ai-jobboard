@@ -14,7 +14,7 @@ export function FinalCta() {
           Discover jobs that match your ambitions, not just your keywords.
         </p>
         <Link
-          href="/onboarding"
+          href="/signup"
           className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 text-[15px] font-medium text-white transition hover:bg-accent-hover sm:w-auto"
         >
           Create your profile

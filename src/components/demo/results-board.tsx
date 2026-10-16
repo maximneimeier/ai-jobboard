@@ -3,36 +3,24 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { rankDemoJobs, rankingHint, type RankedDemoJob } from "@/lib/demo/match";
 import {
-  EMPLOYMENT_LABEL,
-  FIT_CLASS,
-  FIT_LABEL,
-  INDUSTRY_LABEL,
-  matchChecks,
-  LEVEL_LABEL,
-  SEARCH_LABEL,
-  WORK_MODE_LABEL,
-  postedLabel,
-  rankDemoJobs,
-  salaryLabel,
-} from "@/lib/demo/match";
-import { catalogLocations, INDUSTRIES, type Employment, type Level, type WorkMode } from "@/lib/demo/jobs";
-import {
-  addLocationTag,
-  addRoleTag,
-  resetFilters,
-  setFilters,
+  clearJobFeedback,
+  setJobFeedback,
   setSearch,
   setSort,
-  toggleLocationTag,
-  toggleRoleTag,
   toggleSave,
   useDemo,
-  type DemoFilters,
+  type FeedbackAction,
+  type FeedbackReason,
 } from "@/lib/demo/store";
-import { DemoBanner } from "./demo-banner";
+import { ActiveFilterChips, JobFilterSidebar } from "./job-filter-sidebar";
+import { JobMatchPanel } from "./job-match-panel";
+import { JobResultCard } from "./job-result-card";
+import { MatchContextBar } from "./match-context-bar";
 import { SignupModal } from "./signup-modal";
-import { SkillChecks } from "./skill-checks";
+
+type JobsView = "best" | "discover";
 
 export function ResultsBoard({
   initialRole,
@@ -47,6 +35,8 @@ export function ResultsBoard({
   const router = useRouter();
   const [signupOpen, setSignupOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [view, setView] = useState<JobsView>("best");
+  const [openJobId, setOpenJobId] = useState<string | null>(null);
 
   useEffect(() => {
     if (demo.roleTags.length || demo.locationTags.length) return;
@@ -76,138 +66,119 @@ export function ResultsBoard({
     [query, location, demo.filters, demo.sort, demo.profile, demo.personalized, demo.roleTags, demo.locationTags],
   );
 
+  const hidden = useMemo(() => {
+    return new Set(
+      (demo.jobFeedback ?? [])
+        .filter((item) => item.action === "not_interested")
+        .map((item) => item.jobId),
+    );
+  }, [demo.jobFeedback]);
+
+  const visible = results.filter((job) => !hidden.has(job.id));
+  const { best, discover } = splitJobs(visible, demo.personalized);
+  const shown = view === "best" ? best : discover;
+  const openJob = shown.concat(visible).find((job) => job.id === openJobId) ?? null;
+  const heading = demo.roleTags.length
+    ? demo.roleTags.join(", ")
+    : query || "Open search";
+  const place = demo.locationTags.length
+    ? demo.locationTags.join(", ")
+    : location;
+
   function onSave(jobId: string) {
     const result = toggleSave(jobId);
     if (result.needsSignup) setSignupOpen(true);
   }
 
+  function onFeedback(jobId: string, action: FeedbackAction, reason?: FeedbackReason) {
+    setJobFeedback(jobId, action, reason);
+  }
+
   return (
-    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8 px-5 py-10 md:flex-row md:px-8">
-      <aside className="md:w-[280px] md:shrink-0">
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 px-5 py-8 md:flex-row md:px-8">
+      <div className="md:hidden">
         <button
           type="button"
-          className="mb-4 inline-flex h-10 items-center rounded-md px-3 text-[14px] ring-1 ring-hairline md:hidden"
-          onClick={() => setFiltersOpen((value) => !value)}
+          className="inline-flex h-10 items-center rounded-lg px-3 text-[14px] ring-1 ring-hairline"
+          onClick={() => setFiltersOpen(true)}
         >
-          {filtersOpen ? "Hide filters" : "Filters"}
+          Filters
         </button>
-        <div className={filtersOpen ? "block" : "hidden md:block"}>
-          <FilterPanel filters={demo.filters} />
-        </div>
-      </aside>
+      </div>
+      <JobFilterSidebar
+        filters={demo.filters}
+        resultCount={visible.length}
+        mobileOpen={filtersOpen}
+        onCloseMobile={() => setFiltersOpen(false)}
+        personalized={demo.personalized}
+      />
 
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-          Results
-        </p>
-        <h1 className="font-display mt-2 text-[32px] font-semibold tracking-[-0.32px] text-ink">
-          {demo.roleTags.length
-            ? demo.roleTags.join(", ")
-            : query || "Open search"}
-          {demo.locationTags.length
-            ? ` in ${demo.locationTags.join(", ")}`
-            : location
-              ? ` in ${location}`
-              : ""}
-        </h1>
-        <p className="mt-2 text-[15px] text-body">
-          {results.length} {results.length === 1 ? "job" : "jobs"} matching your search.
-        </p>
-
-        {demo.profile?.desiredRoles.length ? (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {demo.profile.desiredRoles.map((role) => {
-              const on = demo.roleTags.includes(role);
-              return (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => toggleRoleTag(role)}
-                  className={
-                    on
-                      ? "inline-flex h-8 items-center rounded-full bg-accent px-3 text-[13px] font-medium text-white"
-                      : "inline-flex h-8 items-center rounded-full bg-surface px-3 text-[13px] font-medium text-ink ring-1 ring-hairline"
-                  }
-                >
-                  {role}
-                </button>
-              );
-            })}
-            <Link
-              href="/onboarding/roles"
-              className="inline-flex h-8 items-center rounded-full px-3 text-[13px] font-medium text-muted hover:text-ink"
-            >
-              Edit roles
-            </Link>
-          </div>
-        ) : null}
-
-        {demo.profile?.desiredLocations.length ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {demo.profile.desiredLocations.map((place) => {
-              const on = demo.locationTags.includes(place);
-              return (
-                <button
-                  key={place}
-                  type="button"
-                  onClick={() => toggleLocationTag(place)}
-                  className={
-                    on
-                      ? "inline-flex h-8 items-center rounded-full bg-accent px-3 text-[13px] font-medium text-white"
-                      : "inline-flex h-8 items-center rounded-full bg-surface px-3 text-[13px] font-medium text-ink ring-1 ring-hairline"
-                  }
-                >
-                  {place}
-                </button>
-              );
-            })}
-            <Link
-              href="/onboarding/roles"
-              className="inline-flex h-8 items-center rounded-full px-3 text-[13px] font-medium text-muted hover:text-ink"
-            >
-              Edit locations
-            </Link>
-          </div>
-        ) : null}
-
-        <div className="mt-4">
-          <DemoBanner>
-            {demo.personalized
-              ? "Matches are ranked using your role, skills, and preferences."
-              : "Add a profile to see why each role may fit you."}
-          </DemoBanner>
+        <div className="flex flex-wrap gap-1.5">
+          <ViewTab
+            href={undefined}
+            active={view === "best"}
+            onClick={() => setView("best")}
+            label="Best matches"
+            count={best.length}
+          />
+          <ViewTab
+            href={undefined}
+            active={view === "discover"}
+            onClick={() => setView("discover")}
+            label="Discover"
+            count={discover.length}
+          />
+          <ViewTab href="/konto/bewerbungen" label="My applications" />
         </div>
 
-        {demo.personalized ? null : (
-          <div className="mt-6 flex flex-col gap-3 rounded-lg bg-surface p-4 ring-1 ring-hairline-soft md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[14px] font-medium text-ink">
-                Want more personalized results?
-              </p>
-              <p className="mt-1 text-[13px] leading-5 text-body">
-                Add your experience so we can rank roles that fit you.
-              </p>
-            </div>
-            <Link
-              href="/onboarding"
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl bg-ink px-4 text-[14px] font-medium text-white"
-            >
-              Create your profile
-            </Link>
-          </div>
-        )}
+        <p className="mt-5 text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
+          {view === "best" ? "Best matches" : "Discover"}
+        </p>
+        <h1 className="font-display mt-1.5 text-[28px] font-semibold tracking-[-0.32px] text-ink md:text-[32px]">
+          {heading}
+          {place ? ` in ${place}` : ""}
+        </h1>
+        <p className="mt-2 text-[14px] text-body">
+          {shown.length} {shown.length === 1 ? "job" : "jobs"}
+          {hidden.size ? ` · ${hidden.size} hidden after feedback` : ""}.{" "}
+          {rankingHint(demo.personalized)}
+        </p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2">
+        <div className="mt-5">
+          <MatchContextBar profile={demo.profile} personalized={demo.personalized} />
+        </div>
+
+        <div className="mt-4">
+          <ActiveFilterChips />
+        </div>
+
+        {hidden.size ? (
+          <p className="mt-3 text-[12px] text-muted">
+            Jobs marked not interested stay hidden on this page.{" "}
+            <button
+              type="button"
+              className="text-ink underline"
+              onClick={() => {
+                for (const item of demo.jobFeedback) {
+                  if (item.action === "not_interested") clearJobFeedback(item.jobId);
+                }
+              }}
+            >
+              Show them again
+            </button>
+          </p>
+        ) : null}
+
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <label className="text-[13px] text-muted" htmlFor="sort">
             Sort
           </label>
           <select
             id="sort"
             value={demo.sort}
-            onChange={(event) =>
-              setSort(event.target.value as typeof demo.sort)
-            }
-            className="h-10 rounded-md bg-surface px-3 text-[14px] ring-1 ring-hairline outline-none"
+            onChange={(event) => setSort(event.target.value as typeof demo.sort)}
+            className="h-9 rounded-md bg-surface px-3 text-[14px] ring-1 ring-hairline outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <option value="relevant">Most relevant</option>
             <option value="recent">Most recent</option>
@@ -215,98 +186,42 @@ export function ResultsBoard({
           </select>
         </div>
 
-        {results.length === 0 ? (
-          <p className="mt-10 rounded-lg bg-surface px-5 py-10 text-[15px] text-body ring-1 ring-hairline-soft">
-            No results for these filters. Reset them or change the role and city.
-          </p>
+        {shown.length === 0 ? (
+          <EmptyState
+            view={view}
+            hasResults={visible.length > 0}
+            onDiscover={() => setView("discover")}
+          />
         ) : (
-          <ul className="mt-6 grid gap-3">
-            {results.map((job) => (
+          <ul className="mt-4 grid gap-2">
+            {shown.map((job) => (
               <li key={job.id}>
-                <article className="rounded-lg bg-surface p-5 ring-1 ring-hairline-soft md:p-6">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-[17px] font-medium tracking-[-0.16px] text-ink">
-                          {job.title}
-                        </h2>
-                        {demo.personalized && job.fit ? (
-                          <span
-                            className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${FIT_CLASS[job.fit]}`}
-                          >
-                            {FIT_LABEL[job.fit]}
-                          </span>
-                        ) : (
-                          <span className="rounded-md bg-surface-soft px-2 py-0.5 text-[11px] font-medium text-ink">
-                            {SEARCH_LABEL[job.searchLabel]}
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 text-[14px] text-body">
-                        {job.company} · {job.location} · {WORK_MODE_LABEL[job.workMode]} ·{" "}
-                        {EMPLOYMENT_LABEL[job.employment]} · {LEVEL_LABEL[job.level]}
-                      </p>
-                      <p className="mt-2 text-[13px] text-muted">
-                        {salaryLabel(job)} · {postedLabel(job.postedDaysAgo)} ·{" "}
-                        {job.source}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-[14px] leading-6 text-body">{job.summary}</p>
-                  {demo.personalized && demo.profile ? (
-                    <SkillChecks checks={matchChecks(job, demo.profile)} />
-                  ) : (
-                    <p className="mt-2 text-[13px] text-muted">
-                      {job.skills.slice(0, 5).join(" · ")}
-                    </p>
-                  )}
-
-                  {demo.personalized ? (
-                    <div className="mt-4 grid gap-3 md:grid-cols-2">
-                      <div>
-                        <p className="text-[12px] font-medium text-ink">
-                          Why this job fits you
-                        </p>
-                        <ul className="mt-2 space-y-1 text-[13px] leading-5 text-body">
-                          {job.why.map((item) => (
-                            <li key={item}>· {item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="text-[12px] font-medium text-ink">
-                          Things to consider
-                        </p>
-                        <ul className="mt-2 space-y-1 text-[13px] leading-5 text-body">
-                          {job.consider.map((item) => (
-                            <li key={item}>· {item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Link
-                      href={`/jobs/${job.id}`}
-                      className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] font-medium text-white"
-                    >
-                      Details
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => onSave(job.id)}
-                      className="inline-flex h-10 items-center rounded-md px-4 text-[14px] font-medium text-ink ring-1 ring-hairline"
-                    >
-                      {demo.savedIds.includes(job.id) ? "Saved" : "Save"}
-                    </button>
-                  </div>
-                </article>
+                <JobResultCard
+                  job={job}
+                  profile={demo.profile}
+                  personalized={demo.personalized}
+                  saved={demo.savedIds.includes(job.id)}
+                  feedback={demo.jobFeedback?.find((item) => item.jobId === job.id)?.action}
+                  onOpen={() => setOpenJobId(job.id)}
+                  onSave={() => onSave(job.id)}
+                  onFeedback={(action, reason) => onFeedback(job.id, action, reason)}
+                />
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {openJob ? (
+        <JobMatchPanel
+          job={openJob}
+          profile={demo.profile}
+          personalized={demo.personalized}
+          saved={demo.savedIds.includes(openJob.id)}
+          onClose={() => setOpenJobId(null)}
+          onSave={() => onSave(openJob.id)}
+        />
+      ) : null}
 
       <SignupModal
         open={signupOpen || Boolean(demo.pendingSaveId)}
@@ -316,261 +231,78 @@ export function ResultsBoard({
   );
 }
 
-function FilterPanel({
-  filters,
-}: {
-  filters: DemoFilters;
-}) {
-  const demo = useDemo();
-  const [roleDraft, setRoleDraft] = useState("");
-  const [placeDraft, setPlaceDraft] = useState("");
-  const { cities, countries } = catalogLocations();
-  const rolePool = uniqueKeep([
-    ...(demo.profile?.desiredRoles ?? []),
-    ...demo.roleTags,
-  ]);
-  const placePool = uniqueKeep([
-    ...(demo.profile?.desiredLocations ?? []),
-    ...demo.locationTags,
-    ...cities,
-    ...countries,
-  ]);
-
-  function patch(partial: Partial<DemoFilters>) {
-    setFilters({ ...filters, ...partial });
+function splitJobs(jobs: RankedDemoJob[], personalized: boolean) {
+  if (personalized) {
+    const best = jobs.filter((job) => job.fit === "strong" || job.fit === "good" || !job.fit);
+    const discover = jobs.filter((job) => job.fit === "stretch" || job.fit === "review");
+    if (!best.length) return { best: jobs, discover };
+    return { best, discover };
   }
+  const best = jobs.filter((job) => job.searchLabel === "match");
+  const discover = jobs.filter((job) => job.searchLabel !== "match");
+  if (!best.length) return { best: jobs, discover: [] };
+  return { best, discover };
+}
 
+function ViewTab({
+  label,
+  count,
+  active,
+  href,
+  onClick,
+}: {
+  label: string;
+  count?: number;
+  active?: boolean;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const className = active
+    ? "inline-flex h-9 items-center rounded-lg bg-ink px-3 text-[13px] font-medium text-white"
+    : "inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-hairline hover:bg-surface";
+  const text = count === undefined ? label : `${label} · ${count}`;
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {text}
+      </Link>
+    );
+  }
   return (
-    <div className="rounded-lg bg-surface p-4 ring-1 ring-hairline-soft">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[14px] font-medium text-ink">Filter</p>
-        <button
-          type="button"
-          onClick={() => resetFilters()}
-          className="text-[12px] text-muted hover:text-ink"
-        >
-          Reset filters
-        </button>
-      </div>
-      <div className="mt-4 grid gap-4">
-        <div>
-          <p className="text-[12px] font-medium text-muted">Roles</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {rolePool.map((role) => {
-              const on = demo.roleTags.includes(role);
-              return (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => toggleRoleTag(role)}
-                  className={filterChip(on)}
-                >
-                  {role}
-                </button>
-              );
-            })}
-          </div>
-          <FilterAdd
-            value={roleDraft}
-            placeholder="Add a role"
-            onChange={setRoleDraft}
-            onAdd={() => {
-              addRoleTag(roleDraft);
-              setRoleDraft("");
-            }}
-          />
-        </div>
-        <div>
-          <p className="text-[12px] font-medium text-muted">Cities & countries</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {placePool.map((place) => {
-              const on = demo.locationTags.includes(place);
-              return (
-                <button
-                  key={place}
-                  type="button"
-                  onClick={() => toggleLocationTag(place)}
-                  className={filterChip(on)}
-                >
-                  {place}
-                </button>
-              );
-            })}
-          </div>
-          <FilterAdd
-            value={placeDraft}
-            placeholder="Add a city or country"
-            onChange={setPlaceDraft}
-            onAdd={() => {
-              addLocationTag(placeDraft);
-              setPlaceDraft("");
-            }}
-          />
-        </div>
-        <fieldset>
-          <legend className="text-[12px] font-medium text-muted">Work mode</legend>
-          <div className="mt-2 grid gap-1">
-            {(["remote", "hybrid", "onsite"] as WorkMode[]).map((mode) => (
-              <label key={mode} className="flex items-center gap-2 text-[13px] text-ink">
-                <input
-                  type="checkbox"
-                  checked={filters.workModes.includes(mode)}
-                  onChange={() =>
-                    patch({
-                      workModes: toggleIn(filters.workModes, mode),
-                    })
-                  }
-                />
-                {WORK_MODE_LABEL[mode]}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend className="text-[12px] font-medium text-muted">Level</legend>
-          <div className="mt-2 grid gap-1">
-            {(["junior", "mid", "senior"] as Level[]).map((level) => (
-              <label key={level} className="flex items-center gap-2 text-[13px] text-ink">
-                <input
-                  type="checkbox"
-                  checked={filters.levels.includes(level)}
-                  onChange={() =>
-                    patch({ levels: toggleIn(filters.levels, level) })
-                  }
-                />
-                {LEVEL_LABEL[level]}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend className="text-[12px] font-medium text-muted">Industry</legend>
-          <div className="mt-2 grid gap-1">
-            {INDUSTRIES.map((industry) => (
-              <label
-                key={industry}
-                className="flex items-center gap-2 text-[13px] text-ink"
-              >
-                <input
-                  type="checkbox"
-                  checked={filters.industries.includes(industry)}
-                  onChange={() =>
-                    patch({
-                      industries: toggleIn(filters.industries, industry),
-                    })
-                  }
-                />
-                {INDUSTRY_LABEL[industry]}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <label className="grid gap-1 text-[12px] font-medium text-muted">
-          Salary from, in k
-          <input
-            type="number"
-            min={0}
-            inputMode="numeric"
-            value={filters.salaryMin || ""}
-            placeholder="e.g. 80"
-            onChange={(event) =>
-              patch({ salaryMin: Number(event.target.value) || 0 })
-            }
-            className="h-10 rounded-md bg-canvas px-3 text-[14px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft"
-          />
-        </label>
-        <fieldset>
-          <legend className="text-[12px] font-medium text-muted">Employment</legend>
-          <div className="mt-2 grid gap-1">
-            {(["fulltime", "parttime", "contract"] as Employment[]).map((item) => (
-              <label key={item} className="flex items-center gap-2 text-[13px] text-ink">
-                <input
-                  type="checkbox"
-                  checked={filters.employment.includes(item)}
-                  onChange={() =>
-                    patch({ employment: toggleIn(filters.employment, item) })
-                  }
-                />
-                {EMPLOYMENT_LABEL[item]}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <label className="grid gap-1 text-[12px] font-medium text-muted">
-          Date posted
-          <select
-            value={filters.maxAgeDays}
-            onChange={(event) =>
-              patch({ maxAgeDays: Number(event.target.value) })
-            }
-            className="h-10 rounded-md bg-canvas px-3 text-[14px] text-ink ring-1 ring-hairline outline-none"
-          >
-            <option value={0}>Any time</option>
-            <option value={1}>Last 24 hours</option>
-            <option value={7}>Last 7 days</option>
-            <option value={14}>Last 14 days</option>
-            <option value={30}>Last 30 days</option>
-          </select>
-        </label>
-      </div>
-    </div>
+    <button type="button" onClick={onClick} className={className} aria-current={active ? "page" : undefined}>
+      {text}
+    </button>
   );
 }
 
-function toggleIn<T>(list: T[], item: T) {
-  return list.includes(item) ? list.filter((value) => value !== item) : [...list, item];
-}
-
-function uniqueKeep(values: string[]) {
-  const seen = new Set<string>();
-  const next: string[] = [];
-  for (const value of values) {
-    const key = value.trim().toLowerCase();
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    next.push(value);
-  }
-  return next;
-}
-
-function filterChip(on: boolean) {
-  return on
-    ? "inline-flex h-7 items-center rounded-full bg-accent px-2.5 text-[12px] font-medium text-white"
-    : "inline-flex h-7 items-center rounded-full bg-canvas px-2.5 text-[12px] font-medium text-ink ring-1 ring-hairline";
-}
-
-function FilterAdd({
-  value,
-  placeholder,
-  onChange,
-  onAdd,
+function EmptyState({
+  view,
+  hasResults,
+  onDiscover,
 }: {
-  value: string;
-  placeholder: string;
-  onChange: (value: string) => void;
-  onAdd: () => void;
+  view: JobsView;
+  hasResults: boolean;
+  onDiscover: () => void;
 }) {
   return (
-    <span className="mt-2 flex gap-1.5">
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            onAdd();
-          }
-        }}
-        placeholder={placeholder}
-        className="h-9 min-w-0 flex-1 rounded-md bg-canvas px-2.5 text-[13px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft"
-      />
-      <button
-        type="button"
-        onClick={onAdd}
-        className="inline-flex h-9 items-center rounded-md px-2.5 text-[12px] font-medium text-ink ring-1 ring-hairline"
-      >
-        Add
-      </button>
-    </span>
+    <div className="mt-8 rounded-xl bg-surface px-5 py-10 ring-1 ring-hairline-soft">
+      <p className="text-[15px] font-medium text-ink">
+        {view === "discover" ? "No extra roles in Discover" : "No matching jobs"}
+      </p>
+      <p className="mt-2 max-w-[48ch] text-[14px] leading-6 text-body">
+        {hasResults && view === "best"
+          ? "Nothing in Best matches for these filters. Try Discover, or reset a filter."
+          : "Reset filters or change the role and city."}
+      </p>
+      {hasResults && view === "best" ? (
+        <button
+          type="button"
+          onClick={onDiscover}
+          className="mt-4 inline-flex h-9 items-center rounded-lg bg-ink px-3.5 text-[13px] font-medium text-white"
+        >
+          Open Discover
+        </button>
+      ) : null}
+    </div>
   );
 }

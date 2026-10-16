@@ -23,7 +23,7 @@ export function PersonalizationPreview() {
             profile to rank roles — while you stay in control of what you share.
           </p>
           <Link
-            href="/onboarding"
+            href="/signup"
             className="mt-8 inline-flex h-12 items-center rounded-xl bg-accent px-5 text-[15px] font-medium text-white transition hover:bg-accent-hover"
           >
             Create your profile

@@ -59,7 +59,7 @@ export function LandingNav() {
               </button>
             )}
             <Link
-              href="/onboarding"
+              href="/signup"
               className="inline-flex h-9 items-center rounded-xl bg-accent px-3.5 text-[14px] font-medium text-white transition hover:bg-accent-hover"
             >
               Get Started
@@ -105,7 +105,7 @@ export function LandingNav() {
                 </button>
               )}
               <Link
-                href="/onboarding"
+                href="/signup"
                 className="inline-flex h-10 items-center justify-center rounded-xl bg-accent text-[14px] font-medium text-white"
                 onClick={() => setOpen(false)}
               >

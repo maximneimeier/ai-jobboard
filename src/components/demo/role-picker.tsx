@@ -128,10 +128,10 @@ export function RolePicker() {
   return (
     <div className="mx-auto w-full max-w-[760px] px-5 py-10 md:px-8">
       <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-        Matching roles
+        Job preferences
       </p>
       <h1 className="font-display mt-2 text-[32px] font-semibold tracking-[-0.32px] text-ink">
-        Which roles should we look for?
+        What are you looking for?
       </h1>
       <p className="mt-3 max-w-[54ch] text-[16px] leading-7 text-body">
         We ranked these from your profile. Turn on the ones you want, or type a

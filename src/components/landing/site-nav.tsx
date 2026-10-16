@@ -55,7 +55,7 @@ export function SiteNav() {
             </Link>
           ) : (
             <Link
-              href="/onboarding"
+              href="/signup"
               className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
             >
               Create your profile
@@ -104,7 +104,7 @@ export function SiteNav() {
               </Link>
             ))}
             <Link
-              href={signedUp ? "/konto" : "/onboarding"}
+              href={signedUp ? "/konto" : "/signup"}
               className="text-[14px] font-medium"
               onClick={() => setOpen(false)}
             >

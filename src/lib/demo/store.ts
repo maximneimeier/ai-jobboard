@@ -58,6 +58,8 @@ export type DemoApplication = {
   updatedAt: number;
 };
 
+export type FitFilter = "strong" | "good" | "stretch" | "review";
+
 export type DemoFilters = {
   title: string;
   location: string;
@@ -67,6 +69,23 @@ export type DemoFilters = {
   salaryMin: number;
   employment: Employment[];
   maxAgeDays: number;
+  fits: FitFilter[];
+};
+
+export type FeedbackAction = "interested" | "not_interested" | "save_later";
+export type FeedbackReason =
+  | "wrong_role"
+  | "wrong_location"
+  | "salary"
+  | "seniority"
+  | "industry"
+  | "other";
+
+export type JobFeedback = {
+  jobId: string;
+  action: FeedbackAction;
+  reason?: FeedbackReason;
+  updatedAt: number;
 };
 
 export type DemoSort = "relevant" | "recent" | "salary";
@@ -85,6 +104,7 @@ export type DemoState = {
   email: string;
   applications: DemoApplication[];
   pendingSaveId: string | null;
+  jobFeedback: JobFeedback[];
 };
 
 function newId(prefix: string) {
@@ -122,11 +142,11 @@ export const SAMPLE_PROFILE: CareerProfile = {
   currentRole: "Software Engineer",
   years: 2,
   education: "BSc · Computer Science · Technical University of Berlin",
-  skills: ["TypeScript", "React", "Node.js", "PostgreSQL"],
+  skills: ["TypeScript", "React", "Node.js", "PostgreSQL", "Next.js", "Git", "CSS"],
   abilities: ["Product thinking", "Stakeholder communication", "Mentoring"],
   languages: ["English", "German"],
-  desiredRoles: ["Software Engineer", "Frontend Engineer"],
-  desiredLocations: ["Berlin", "Germany"],
+  desiredRoles: ["Software Engineer", "Frontend Engineer", "Full Stack Engineer"],
+  desiredLocations: ["Berlin", "Germany", "Amsterdam"],
   location: "Berlin",
   remote: "hybrid",
   salaryMin: 70,
@@ -212,6 +232,7 @@ export const EMPTY_FILTERS: DemoFilters = {
   salaryMin: 0,
   employment: [],
   maxAgeDays: 0,
+  fits: [],
 };
 
 const STORAGE_KEY = "atheniks.demo.v2";
@@ -231,6 +252,7 @@ export const INITIAL_STATE: DemoState = {
   email: "",
   applications: [],
   pendingSaveId: null,
+  jobFeedback: [],
 };
 
 let rawCache: string | null = null;
@@ -416,6 +438,12 @@ function parse(raw: string | null): DemoState {
           typeof data.filters?.salaryMin === "number" ? data.filters.salaryMin : 0,
         maxAgeDays:
           typeof data.filters?.maxAgeDays === "number" ? data.filters.maxAgeDays : 0,
+        fits: asStringArray(data.filters?.fits).filter((item): item is FitFilter =>
+          item === "strong" ||
+          item === "good" ||
+          item === "stretch" ||
+          item === "review",
+        ),
       },
       sort: data.sort === "recent" || data.sort === "salary" ? data.sort : "relevant",
       profile:
@@ -448,6 +476,12 @@ function parse(raw: string | null): DemoState {
         : [],
       pendingSaveId:
         typeof data.pendingSaveId === "string" ? data.pendingSaveId : null,
+      jobFeedback: Array.isArray(data.jobFeedback)
+        ? data.jobFeedback.filter(
+            (item): item is JobFeedback =>
+              Boolean(item && typeof item.jobId === "string" && typeof item.action === "string"),
+          )
+        : [],
     };
   } catch {
     return INITIAL_STATE;
@@ -718,6 +752,60 @@ export function completeSignup(email = "alex@gmail.com") {
 
 export function dismissSignup() {
   patch({ pendingSaveId: null });
+}
+
+export const FEEDBACK_REASON_LABEL: Record<FeedbackReason, string> = {
+  wrong_role: "Wrong role",
+  wrong_location: "Wrong location",
+  salary: "Salary too low",
+  seniority: "Seniority mismatch",
+  industry: "Industry not interesting",
+  other: "Other",
+};
+
+export function setJobFeedback(
+  jobId: string,
+  action: FeedbackAction,
+  reason?: FeedbackReason,
+) {
+  const current = load();
+  const next: JobFeedback = {
+    jobId,
+    action,
+    reason,
+    updatedAt: Date.now(),
+  };
+  const jobFeedback = [
+    next,
+    ...current.jobFeedback.filter((item) => item.jobId !== jobId),
+  ];
+  const extra: Partial<DemoState> = {};
+  if (action === "save_later" && !current.savedIds.includes(jobId)) {
+    extra.savedIds = [jobId, ...current.savedIds];
+  }
+  if (action === "interested") {
+    const existing = current.applications.find((item) => item.jobId === jobId);
+    extra.applications = [
+      {
+        jobId,
+        status: existing?.status && existing.status !== "interested" ? existing.status : "interested",
+        notes: existing?.notes ?? "",
+        followUp: existing?.followUp ?? "",
+        updatedAt: Date.now(),
+      },
+      ...current.applications.filter((item) => item.jobId !== jobId),
+    ];
+    extra.savedIds = current.savedIds.includes(jobId)
+      ? current.savedIds
+      : [jobId, ...current.savedIds];
+  }
+  patch({ jobFeedback, ...extra });
+}
+
+export function clearJobFeedback(jobId: string) {
+  patch({
+    jobFeedback: load().jobFeedback.filter((item) => item.jobId !== jobId),
+  });
 }
 
 export function upsertApplication(

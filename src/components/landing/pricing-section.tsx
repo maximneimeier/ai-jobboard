@@ -38,7 +38,7 @@ export function PricingSection() {
               ))}
             </ul>
             <a
-              href="/onboarding"
+              href="/signup"
               className="mt-auto inline-flex h-11 w-full items-center justify-center rounded-xl px-4 text-[15px] font-medium text-ink ring-1 ring-hairline transition hover:bg-surface"
             >
               Start for free
