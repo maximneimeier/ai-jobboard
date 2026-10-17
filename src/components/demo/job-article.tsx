@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { demoJobById } from "@/lib/demo/jobs";
+import { paths } from "@/lib/demo/paths";
 import {
   EMPLOYMENT_LABEL,
   LEVEL_LABEL,
@@ -13,12 +15,20 @@ import {
   salaryLabel,
 } from "@/lib/demo/match";
 import { toggleSave, upsertApplication, useDemo } from "@/lib/demo/store";
-import { MatchBadge } from "./match-badge";
+import { ExperienceMark, MatchBadge } from "./match-badge";
 import { PreparePanel } from "./prepare-panel";
 import { SkillChecks } from "./skill-checks";
 
+function jobOrigin(from: string | null) {
+  if (from === "saved") return { href: paths.saved, label: "Saved jobs" };
+  if (from === "overview") return { href: paths.account, label: "Overview" };
+  if (from === "applications") return { href: paths.applications, label: "Applications" };
+  return { href: paths.jobs, label: "Results" };
+}
+
 export function JobArticle({ jobId }: { jobId: string }) {
   const demo = useDemo();
+  const origin = jobOrigin(useSearchParams().get("from"));
   const [prepareOpen, setPrepareOpen] = useState(false);
   const job = demoJobById(jobId);
   const ranked = useMemo(() => {
@@ -48,8 +58,8 @@ export function JobArticle({ jobId }: { jobId: string }) {
     return (
       <div className="mx-auto max-w-[800px] px-5 py-16">
         <p className="text-[15px] text-body">This job is no longer available.</p>
-        <Link href="/jobs" className="mt-4 inline-flex text-[14px] text-ink underline">
-          Back to results
+        <Link href={origin.href} className="mt-4 inline-flex text-[14px] text-ink underline">
+          Back to {origin.label.toLowerCase()}
         </Link>
       </div>
     );
@@ -69,15 +79,24 @@ export function JobArticle({ jobId }: { jobId: string }) {
 
   return (
     <article className="mx-auto w-full max-w-[800px] px-5 py-12 md:px-8">
-      <Link href="/jobs" className="text-[13px] text-muted hover:text-ink">
-        ← Results
-      </Link>
+      <nav aria-label="Breadcrumb" className="text-[13px] text-muted">
+        <Link href={origin.href} className="hover:text-ink">
+          {origin.label}
+        </Link>
+        <span className="px-1.5" aria-hidden>
+          /
+        </span>
+        <span className="text-ink">{job.title}</span>
+      </nav>
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <MatchBadge
           fit={ranked.fit}
           searchLabel={ranked.searchLabel}
           personalized={demo.personalized}
         />
+        {demo.personalized && demo.profile ? (
+          <ExperienceMark years={demo.profile.years} level={job.level} />
+        ) : null}
         <span className="text-[12px] text-muted">{job.source}</span>
       </div>
       <h1 className="font-display mt-3 text-[36px] leading-[1.1] font-semibold tracking-[-0.04em] text-ink">

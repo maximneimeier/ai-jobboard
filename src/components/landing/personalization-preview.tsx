@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { FileUp } from "lucide-react";
 
-const SKILLS = ["Financial Modeling", "Excel", "Valuation", "TypeScript", "React"];
-const ROLES = ["Investment Analyst", "Software Engineer"];
-const PLACES = ["Munich", "Berlin", "Hybrid"];
+const SKILLS = ["TypeScript", "React", "Node.js", "PostgreSQL", "Git"];
+const ROLES = ["Software Engineer", "Frontend Engineer", "Full Stack Engineer"];
+const PLACES = ["Berlin", "Germany", "Amsterdam"];
 
 export function PersonalizationPreview() {
   return (
@@ -19,8 +19,8 @@ export function PersonalizationPreview() {
             A job search that understands you.
           </h2>
           <p className="mt-4 text-[16px] leading-7 text-body">
-            Add your experience and career preferences once. Matching uses that
-            profile to rank roles — while you stay in control of what you share.
+            Upload a CV or enter your history, then set the roles and places you
+            want. Matching uses that profile, and you can edit every field.
           </p>
           <Link
             href="/signup"
@@ -56,7 +56,7 @@ export function PersonalizationPreview() {
           <p className="mt-5 text-[12px] font-medium text-ink">Preferred locations</p>
           <p className="mt-1 text-[13px] text-body">{PLACES.join(" · ")}</p>
           <p className="mt-5 text-[12px] font-medium text-ink">Matching preferences</p>
-          <p className="mt-1 text-[13px] text-body">Hybrid · Explain every match · Stay in control</p>
+          <p className="mt-1 text-[13px] text-body">Hybrid · Salary from 70k</p>
         </div>
       </div>
     </section>

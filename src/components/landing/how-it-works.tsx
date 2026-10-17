@@ -7,19 +7,19 @@ const STEPS = [
     step: "01",
     icon: UserRound,
     title: "Create your profile",
-    text: "Add your work history, education, skills, and what you want next. You stay in control of every detail.",
+    text: "Upload a CV or enter your history, then choose the roles and places you want. You review every field before matching starts.",
   },
   {
     step: "02",
     icon: Sparkles,
     title: "See jobs that fit",
-    text: "We rank open roles against your profile and explain why each one may be a strong, good, or stretch fit.",
+    text: "Discover ranks open roles and labels each one a strong match, a good match, a stretch, or something that needs review.",
   },
   {
     step: "03",
     icon: CheckCircle2,
-    title: "Move forward with confidence",
-    text: "Save interesting jobs, prepare applications, and keep your search organized in one place.",
+    title: "Track what happens next",
+    text: "Save a role, set its status, and move it on the application board. Connect your inbox to mark offers and rejections.",
   },
 ];
 

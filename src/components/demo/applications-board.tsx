@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { inboxReplyFor, MAIL_DECISION_LABEL, mailDecisionClass } from "@/lib/demo/inbox";
 import { demoJobById } from "@/lib/demo/jobs";
 import { paths } from "@/lib/demo/paths";
 import {
   upsertApplication,
   useDemo,
   type ApplicationStatus,
+  type DemoApplication,
 } from "@/lib/demo/store";
 import { DemoBanner } from "./demo-banner";
 
@@ -20,18 +22,29 @@ const STAGES: { id: ApplicationStatus; label: string }[] = [
   { id: "rejected", label: "Rejected" },
 ];
 
+function followUpLabel(value: string) {
+  if (!value) return null;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
 export function ApplicationsBoard() {
   const demo = useDemo();
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [overStage, setOverStage] = useState<ApplicationStatus | null>(null);
   const grouped = useMemo(() => {
     return STAGES.map((stage) => ({
       ...stage,
       items: demo.applications.filter((item) => item.status === stage.id),
     }));
   }, [demo.applications]);
-  const selectedId = openId ?? demo.applications[0]?.jobId ?? null;
-  const selected = demo.applications.find((item) => item.jobId === selectedId);
-  const job = selected ? demoJobById(selected.jobId) : null;
+
+  function moveCard(jobId: string, status: ApplicationStatus) {
+    const current = demo.applications.find((item) => item.jobId === jobId);
+    if (!current || current.status === status) return;
+    upsertApplication(jobId, { status });
+  }
 
   return (
     <div className="px-5 py-8 md:px-8">
@@ -43,7 +56,7 @@ export function ApplicationsBoard() {
       </h1>
       <div className="mt-4 max-w-xl">
         <DemoBanner>
-          Track status, notes, and follow-ups next to each role.
+          Drag a card into another column to update its status.
         </DemoBanner>
       </div>
 
@@ -52,105 +65,105 @@ export function ApplicationsBoard() {
           No applications yet. Open a job and click Prepare application.
         </p>
       ) : (
-        <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_320px]">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 -mx-5 overflow-x-auto px-5 pb-2 md:-mx-8 md:px-8">
+          <div className="flex min-h-[440px] w-max gap-3">
             {grouped.map((column) => (
               <section
                 key={column.id}
-                className="rounded-lg bg-surface p-3 ring-1 ring-hairline-soft"
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  if (overStage !== column.id) setOverStage(column.id);
+                }}
+                onDragLeave={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                    setOverStage((current) => (current === column.id ? null : current));
+                  }
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const jobId = event.dataTransfer.getData("text/plain") || draggingId;
+                  if (jobId) moveCard(jobId, column.id);
+                  setDraggingId(null);
+                  setOverStage(null);
+                }}
+                className={`flex w-[250px] shrink-0 flex-col rounded-xl p-2 ${
+                  overStage === column.id ? "bg-accent-soft" : "bg-surface-faint ring-1 ring-hairline-soft"
+                }`}
               >
-                <h2 className="px-1 text-[13px] font-medium text-ink">
-                  {column.label} · {column.items.length}
-                </h2>
-                <ul className="mt-2 grid gap-2">
-                  {column.items.map((item) => {
-                    const listing = demoJobById(item.jobId);
-                    if (!listing) return null;
-                    return (
-                      <li key={item.jobId}>
-                        <button
-                          type="button"
-                          onClick={() => setOpenId(item.jobId)}
-                          className="w-full rounded-md bg-canvas px-3 py-3 text-left ring-1 ring-hairline-soft"
-                        >
-                          <p className="text-[14px] font-medium text-ink">
-                            {listing.title}
-                          </p>
-                          <p className="mt-1 text-[12px] text-muted">
-                            {listing.company}
-                          </p>
-                        </button>
-                      </li>
-                    );
-                  })}
+                <header className="flex items-center justify-between px-2 py-1.5">
+                  <h2 className="text-[13px] font-medium text-ink">{column.label}</h2>
+                  <span className="text-[12px] text-muted">{column.items.length}</span>
+                </header>
+                <ul className="mt-1 flex flex-1 flex-col gap-2">
+                  {column.items.map((item) => (
+                    <KanbanCard
+                      key={item.jobId}
+                      item={item}
+                      showMail={demo.inbox.connected}
+                      dragging={draggingId === item.jobId}
+                      onDragStart={() => setDraggingId(item.jobId)}
+                      onDragEnd={() => {
+                        setDraggingId(null);
+                        setOverStage(null);
+                      }}
+                    />
+                  ))}
                 </ul>
               </section>
             ))}
           </div>
-
-          {selected && job ? (
-            <aside className="rounded-lg bg-surface p-5 ring-1 ring-hairline-soft">
-              <p className="text-[12px] text-muted">Details</p>
-              <h2 className="mt-1 text-[17px] font-medium text-ink">{job.title}</h2>
-              <p className="mt-1 text-[14px] text-body">{job.company}</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <Link
-                  href={paths.job(job.id)}
-                  className="inline-flex text-[13px] text-ink underline"
-                >
-                  Open job
-                </Link>
-                <Link
-                  href={paths.savedJob(job.id)}
-                  className="inline-flex text-[13px] text-ink underline"
-                >
-                  Resume and cover letter
-                </Link>
-              </div>
-              <label className="mt-5 grid gap-1 text-[12px] font-medium text-muted">
-                Status
-                <select
-                  value={selected.status}
-                  onChange={(event) =>
-                    upsertApplication(job.id, {
-                      status: event.target.value as ApplicationStatus,
-                    })
-                  }
-                  className="h-10 rounded-md bg-canvas px-3 text-[14px] text-ink ring-1 ring-hairline"
-                >
-                  {STAGES.map((stage) => (
-                    <option key={stage.id} value={stage.id}>
-                      {stage.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="mt-4 grid gap-1 text-[12px] font-medium text-muted">
-                Follow-up
-                <input
-                  type="date"
-                  value={selected.followUp}
-                  onChange={(event) =>
-                    upsertApplication(job.id, { followUp: event.target.value })
-                  }
-                  className="h-10 rounded-md bg-canvas px-3 text-[14px] text-ink ring-1 ring-hairline"
-                />
-              </label>
-              <label className="mt-4 grid gap-1 text-[12px] font-medium text-muted">
-                Notes
-                <textarea
-                  value={selected.notes}
-                  onChange={(event) =>
-                    upsertApplication(job.id, { notes: event.target.value })
-                  }
-                  rows={5}
-                  className="rounded-md bg-canvas px-3 py-2 text-[14px] text-ink ring-1 ring-hairline"
-                />
-              </label>
-            </aside>
-          ) : null}
         </div>
       )}
     </div>
+  );
+}
+
+function KanbanCard({
+  item,
+  showMail,
+  dragging,
+  onDragStart,
+  onDragEnd,
+}: {
+  item: DemoApplication;
+  showMail: boolean;
+  dragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+}) {
+  const listing = demoJobById(item.jobId);
+  if (!listing) return null;
+  const followUp = followUpLabel(item.followUp);
+  const reply = showMail ? inboxReplyFor(item.jobId) : null;
+
+  return (
+    <li
+      draggable
+      onDragStart={(event) => {
+        event.dataTransfer.setData("text/plain", item.jobId);
+        event.dataTransfer.effectAllowed = "move";
+        onDragStart();
+      }}
+      onDragEnd={onDragEnd}
+      className={`cursor-grab rounded-lg bg-surface px-3 py-3 shadow-sm ring-1 ring-hairline-soft active:cursor-grabbing ${
+        dragging ? "opacity-50" : ""
+      }`}
+    >
+      <Link href={paths.savedJob(item.jobId)} className="text-[14px] font-medium text-ink hover:underline">
+        {listing.title}
+      </Link>
+      <p className="mt-1 text-[12px] text-body">{listing.company}</p>
+      {reply ? (
+        <p className="mt-2">
+          <span className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${mailDecisionClass(reply.decision)}`}>
+            {MAIL_DECISION_LABEL[reply.decision]}
+          </span>
+        </p>
+      ) : null}
+      <p className="mt-2 text-[12px] text-muted">
+        {listing.location}
+        {followUp ? ` · Follow up ${followUp}` : ""}
+      </p>
+    </li>
   );
 }

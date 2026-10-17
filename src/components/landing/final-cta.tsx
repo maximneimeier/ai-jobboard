@@ -11,7 +11,7 @@ export function FinalCta() {
           Your next opportunity starts here.
         </h2>
         <p className="mx-auto mt-4 max-w-[42ch] text-[16px] leading-7 text-body">
-          Discover jobs that match your ambitions, not just your keywords.
+          Build your profile, then keep saved roles and applications in one workspace.
         </p>
         <Link
           href="/signup"

@@ -19,7 +19,7 @@ export function SiteNav() {
     { href: paths.jobs, label: "Jobs" },
     { href: "/#how-it-works", label: "How it works" },
     { href: paths.saved, label: "Saved" },
-    { href: "/#pricing", label: "Pricing" },
+    { href: "/#workspace", label: "Workspace" },
   ];
 
   return (

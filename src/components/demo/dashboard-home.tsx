@@ -17,6 +17,7 @@ import {
   type ApplicationStatus,
 } from "@/lib/demo/store";
 import { DemoBanner } from "./demo-banner";
+import { ExperienceMark } from "./match-badge";
 
 const STATUS_LABEL: Record<ApplicationStatus, string> = {
   interested: "Interested",
@@ -103,7 +104,7 @@ export function DashboardHome() {
           {recommended.map((job) => (
             <li key={job.id}>
               <Link
-                href={`/jobs/${job.id}`}
+                href={`/jobs/${job.id}?from=overview`}
                 className="block rounded-lg bg-surface p-5 ring-1 ring-hairline-soft hover:bg-surface-faint"
               >
                 <div className="flex flex-wrap items-center gap-2">
@@ -113,6 +114,7 @@ export function DashboardHome() {
                       {FIT_LABEL[job.fit]}
                     </span>
                   ) : null}
+                  {profile ? <ExperienceMark years={profile.years} level={job.level} /> : null}
                 </div>
                 <p className="mt-1 text-[14px] text-body">
                   {job.company} · {placeLine(job)} · {salaryLabel(job)}
@@ -136,7 +138,7 @@ export function DashboardHome() {
             {saved.map((job) => (
               <li key={job.id}>
                 <Link
-                  href={`/jobs/${job.id}`}
+                  href={`/jobs/${job.id}?from=saved`}
                   className="block rounded-lg bg-surface px-5 py-4 ring-1 ring-hairline-soft hover:bg-surface-faint"
                 >
                   <p className="text-[14px] font-medium text-ink">

@@ -34,7 +34,9 @@ export function AlertsPage() {
       </h1>
       <div className="mt-4">
         <DemoBanner>
-          Alerts use your saved searches. Turn them on for roles you want to keep watching.
+          {demo.preferences.emailAlerts
+            ? "Alerts use your saved searches. Turn them on for roles you want to keep watching."
+            : "Email is off in Settings. These searches stay saved, and new-match mail stays quiet."}
         </DemoBanner>
       </div>
 
@@ -84,13 +86,14 @@ export function AlertsPage() {
                   <p className="mt-1 text-[14px] text-body">{alert.location}</p>
                   <p className="mt-2 text-[12px] font-medium text-muted">
                     {alert.enabled ? "On" : "Paused"}
-                    {alert.enabled && alert.newMatches
+                    {demo.preferences.emailAlerts && alert.enabled && alert.newMatches
                       ? ` · ${alert.newMatches} new ${alert.newMatches === 1 ? "match" : "matches"}`
                       : null}
+                    {demo.preferences.emailAlerts ? "" : " · Email off"}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {alert.enabled && alert.newMatches ? (
+                  {demo.preferences.emailAlerts && alert.enabled && alert.newMatches ? (
                     <Link
                       href={paths.jobsSearch(alert.role, alert.location)}
                       onClick={() => clearAlertMatches(alert.id)}

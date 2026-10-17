@@ -1,22 +1,22 @@
 "use client";
 
-import { FolderCheck, ScanSearch, Target } from "lucide-react";
+import { Inbox, ScanSearch, Send } from "lucide-react";
 
 const FEATURES = [
   {
-    icon: Target,
-    title: "Relevant opportunities",
-    text: "Focus on jobs that align with your interests, experience, and career goals.",
-  },
-  {
     icon: ScanSearch,
-    title: "Transparent matching",
-    text: "Understand why a role may be a good fit and which requirements need a closer look.",
+    title: "Matches you can read",
+    text: "Each listing explains the fit: title, location, level, and which requirements still need confirmation.",
   },
   {
-    icon: FolderCheck,
-    title: "Everything in one place",
-    text: "Keep track of saved opportunities, applications, and next steps without spreadsheets.",
+    icon: Send,
+    title: "Saved jobs and a board",
+    text: "Set a status on a saved role, or drag the card across interested, preparing, applied, interview, offer, and rejected.",
+  },
+  {
+    icon: Inbox,
+    title: "Offers and rejections",
+    text: "Connect the inbox on your account. Replies show on saved jobs and move the matching cards on the board.",
   },
 ];
 
@@ -25,7 +25,7 @@ export function FeatureCards() {
     <section id="features" className="scroll-mt-[84px] bg-canvas py-20 md:py-28">
       <div className="mx-auto max-w-[1120px] px-5 md:px-8">
         <h2 className="font-display max-w-[18ch] text-[32px] leading-[1.15] font-semibold tracking-[-0.32px] text-ink md:text-[40px]">
-          Spend less time searching. More time moving forward.
+          The same workspace you open after you sign in.
         </h2>
         <ul className="mt-10 grid gap-4 md:grid-cols-3">
           {FEATURES.map((item) => (

@@ -6,7 +6,7 @@ const links = [
   { href: "/#how-it-works", label: "How it works" },
   { href: paths.saved, label: "Saved" },
   { href: paths.account, label: "Account" },
-  { href: "/#pricing", label: "Pricing" },
+  { href: "/#workspace", label: "Workspace" },
 ];
 
 export function SiteFooter() {

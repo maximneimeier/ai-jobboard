@@ -10,7 +10,7 @@ import {
   type RankedDemoJob,
 } from "@/lib/demo/match";
 import type { CareerProfile, FeedbackAction, FeedbackReason } from "@/lib/demo/store";
-import { MatchBadge } from "./match-badge";
+import { ExperienceMark, MatchBadge } from "./match-badge";
 import { SkillChecks } from "./skill-checks";
 import { JobFeedbackControls } from "./job-feedback-controls";
 
@@ -62,6 +62,9 @@ export function JobResultCard({
                   searchLabel={job.searchLabel}
                   personalized={personalized}
                 />
+                {personalized && profile ? (
+                  <ExperienceMark years={profile.years} level={job.level} />
+                ) : null}
               </div>
               <p className="mt-0.5 text-[13px] text-body">
                 {job.company}

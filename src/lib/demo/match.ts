@@ -340,10 +340,30 @@ export function suggestedLocations(profile: CareerProfile | null): SuggestedPlac
   return uniqueByFold([...extra, ...catalog], (item) => item.label);
 }
 
+const LEVEL_YEARS: Record<Level, { min: number; label: string }> = {
+  intern: { min: 0, label: "0 years" },
+  junior: { min: 1, label: "1+ years" },
+  mid: { min: 2, label: "2+ years" },
+  senior: { min: 5, label: "5+ years" },
+  lead: { min: 7, label: "7+ years" },
+};
+
+export function experienceVerdict(years: number, level: Level) {
+  const asked = LEVEL_YEARS[level];
+  const enough = years >= asked.min;
+  const yours = `${years} ${years === 1 ? "year" : "years"}`;
+  return {
+    enough,
+    years,
+    asked: asked.label,
+    label: enough
+      ? `Enough experience · ${yours}`
+      : `Not enough experience · ${yours}, asks for ${asked.label}`,
+  };
+}
+
 function levelGap(profileYears: number, level: Level) {
-  if (level === "senior" || level === "lead") return profileYears < 4;
-  if (level === "mid") return profileYears < 1;
-  return false;
+  return !experienceVerdict(profileYears, level).enough;
 }
 
 export function rankDemoJobs(
@@ -416,9 +436,9 @@ export function rankDemoJobs(
         );
       }
       if (locMatch) why.push("The location matches your preference.");
-      if (profile.years && !stretchLevel) {
-        why.push("Your experience level is relevant for this role.");
-      }
+      const experience = experienceVerdict(profile.years, job.level);
+      if (experience.enough) why.push(experience.label);
+      else consider.push(experience.label);
 
       const missing = job.skills.filter((skill) => !hasSkill(skillList, skill));
       if (missing[0]) {
@@ -435,7 +455,6 @@ export function rankDemoJobs(
       if (languageMiss[0]) {
         consider.push(`${languageMiss[0]} is listed on this posting.`);
       }
-      if (stretchLevel) consider.push("The role is aimed at more years of experience.");
       if (salaryGap) consider.push("The listed salary is below your expectation.");
       if (
         (profile.notes || profile.dealBreakers) &&

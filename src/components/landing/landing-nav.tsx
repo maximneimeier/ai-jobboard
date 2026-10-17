@@ -10,7 +10,7 @@ import { Logo } from "./logo";
 const LINKS = [
   { href: "#how-it-works", label: "How It Works" },
   { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "#workspace", label: "Workspace" },
 ];
 
 export function LandingNav() {

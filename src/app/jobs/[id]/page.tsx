@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { JobArticle } from "@/components/demo/job-article";
 import { demoJobById } from "@/lib/demo/jobs";
@@ -14,7 +15,9 @@ export default async function JobDetailPage({
 
   return (
     <div className="min-h-full flex-1 bg-surface">
-      <JobArticle jobId={job?.id ?? id} />
+      <Suspense>
+        <JobArticle jobId={job?.id ?? id} />
+      </Suspense>
     </div>
   );
 }

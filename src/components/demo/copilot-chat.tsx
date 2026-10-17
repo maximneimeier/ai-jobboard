@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUp, Sparkles } from "lucide-react";
 import {
   copilotPrompts,
   copilotReply,
@@ -8,7 +9,6 @@ import {
   type CopilotMessage,
 } from "@/lib/demo/copilot";
 import { useDemo } from "@/lib/demo/store";
-import { DemoBanner } from "./demo-banner";
 
 export function CopilotChat() {
   const demo = useDemo();
@@ -31,6 +31,8 @@ export function CopilotChat() {
     },
   ]);
   const [input, setInput] = useState("");
+  const threadRef = useRef<HTMLDivElement>(null);
+  const you = demo.profile?.fullName.trim().slice(0, 1).toUpperCase() || "Y";
 
   useEffect(() => {
     setMessages((current) => {
@@ -38,6 +40,12 @@ export function CopilotChat() {
       return [{ id: "hello", role: "assistant", text: openingMessage(ctx) }];
     });
   }, [ctx]);
+
+  useEffect(() => {
+    const thread = threadRef.current;
+    if (!thread) return;
+    thread.scrollTop = thread.scrollHeight;
+  }, [messages]);
 
   function ask(prompt: string) {
     const user: CopilotMessage = {
@@ -62,62 +70,93 @@ export function CopilotChat() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] w-full max-w-[720px] flex-col px-5 py-10 md:px-8">
-      <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
-        Career Copilot
-      </p>
-      <h1 className="font-display mt-2 text-[28px] font-semibold text-ink">
-        Career Copilot
-      </h1>
-      <div className="mt-4">
-        <DemoBanner>
-          Answers use your profile, saved jobs, and what is already in your tracker.
-        </DemoBanner>
+    <div className="flex h-dvh min-h-0 flex-col bg-canvas">
+      <header className="flex shrink-0 items-center gap-3 border-b border-hairline-soft bg-surface px-5 py-3.5 md:px-6">
+        <span className="flex size-9 items-center justify-center rounded-full bg-ink text-white">
+          <Sparkles className="size-4" strokeWidth={1.75} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="text-[15px] font-medium text-ink">Career Copilot</h1>
+          <p className="truncate text-[12px] text-muted">
+            Profile, saved jobs, and your applications
+          </p>
+        </div>
+      </header>
+
+      <div ref={threadRef} className="min-h-0 flex-1 overflow-y-auto px-4 py-6 md:px-6">
+        <div className="mx-auto flex w-full max-w-[760px] flex-col gap-4">
+          {messages.map((item) =>
+            item.role === "assistant" ? (
+              <div key={item.id} className="flex items-end gap-2.5">
+                <span className="mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-white">
+                  <Sparkles className="size-3.5" strokeWidth={1.75} />
+                </span>
+                <p className="max-w-[min(100%,38rem)] rounded-2xl rounded-bl-md bg-surface px-4 py-3 text-[15px] leading-6 text-ink ring-1 ring-hairline-soft">
+                  {item.text}
+                </p>
+              </div>
+            ) : (
+              <div key={item.id} className="flex items-end justify-end gap-2.5">
+                <p className="max-w-[min(100%,32rem)] rounded-2xl rounded-br-md bg-ink px-4 py-3 text-[15px] leading-6 text-white">
+                  {item.text}
+                </p>
+                <span className="mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-canvas text-[12px] font-medium text-ink ring-1 ring-hairline">
+                  {you}
+                </span>
+              </div>
+            ),
+          )}
+        </div>
       </div>
-      <div className="mt-6 flex-1 space-y-4">
-        {messages.map((item) => (
-          <div
-            key={item.id}
-            className={item.role === "user" ? "flex justify-end" : ""}
-          >
-            <p
-              className={
-                item.role === "user"
-                  ? "max-w-[85%] rounded-lg bg-ink px-4 py-3 text-[15px] leading-6 text-white"
-                  : "max-w-[85%] rounded-lg bg-surface px-4 py-3 text-[15px] leading-6 text-ink ring-1 ring-hairline-soft"
-              }
-            >
-              {item.text}
-            </p>
+
+      <div className="shrink-0 border-t border-hairline-soft bg-surface px-4 py-3 md:px-6">
+        <div className="mx-auto w-full max-w-[760px]">
+          <div className="mb-2.5 flex gap-2 overflow-x-auto pb-1">
+            {prompts.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => ask(prompt)}
+                className="inline-flex h-8 shrink-0 items-center rounded-full bg-canvas px-3 text-[13px] text-ink ring-1 ring-hairline hover:bg-surface-faint"
+              >
+                {prompt}
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="mt-6 flex flex-wrap gap-2">
-        {prompts.map((prompt) => (
-          <button
-            key={prompt}
-            type="button"
-            onClick={() => ask(prompt)}
-            className="inline-flex h-9 items-center rounded-md px-3 text-[13px] ring-1 ring-hairline"
+          <form
+            noValidate
+            onSubmit={onSubmit}
+            className="flex items-end gap-2 rounded-2xl bg-canvas px-2 py-2 ring-1 ring-hairline focus-within:ring-2 focus-within:ring-accent"
           >
-            {prompt}
-          </button>
-        ))}
+            <label className="sr-only" htmlFor="copilot-input">
+              Message
+            </label>
+            <textarea
+              id="copilot-input"
+              rows={1}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  const text = input.trim();
+                  if (text) ask(text);
+                }
+              }}
+              placeholder="Message Career Copilot"
+              className="max-h-32 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-[15px] leading-6 text-ink outline-none placeholder:text-muted"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim()}
+              aria-label="Send"
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-white disabled:opacity-30"
+            >
+              <ArrowUp className="size-4" strokeWidth={2} />
+            </button>
+          </form>
+        </div>
       </div>
-      <form noValidate onSubmit={onSubmit} className="mt-4 flex gap-2">
-        <input
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          placeholder="Ask a question"
-          className="h-11 flex-1 rounded-md bg-surface px-3 text-[14px] ring-1 ring-hairline outline-none"
-        />
-        <button
-          type="submit"
-          className="inline-flex h-11 items-center rounded-md bg-ink px-4 text-[14px] text-white"
-        >
-          Send
-        </button>
-      </form>
     </div>
   );
 }

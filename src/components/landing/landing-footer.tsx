@@ -19,8 +19,8 @@ export function LandingFooter() {
             Less searching. Better opportunities.
           </p>
           <p id="about" className="mt-4 max-w-[40ch] text-[13px] leading-6 text-muted">
-            Atheniks is a personal AI career copilot. Create your profile,
-            then we match roles to your experience.
+            Atheniks Career Copilot matches roles to your profile, then keeps
+            saved jobs, applications, and inbox replies in one workspace.
           </p>
         </div>
         <ul className="grid grid-cols-2 gap-x-10 gap-y-2.5 text-[14px]">

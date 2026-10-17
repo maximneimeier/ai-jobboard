@@ -66,12 +66,13 @@ export function ResultsBoard({
   );
 
   const hidden = useMemo(() => {
+    if (!demo.preferences.hidePassedJobs) return new Set<string>();
     return new Set(
       (demo.jobFeedback ?? [])
         .filter((item) => item.action === "not_interested")
         .map((item) => item.jobId),
     );
-  }, [demo.jobFeedback]);
+  }, [demo.jobFeedback, demo.preferences.hidePassedJobs]);
 
   const visible = results.filter((job) => !hidden.has(job.id));
   const { best, discover } = splitJobs(visible, demo.personalized);

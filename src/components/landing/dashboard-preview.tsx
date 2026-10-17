@@ -1,30 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, LayoutGrid, Search, Sparkles } from "lucide-react";
+import { Bookmark, BookmarkCheck, LayoutGrid, Search, Send } from "lucide-react";
 
 const JOBS = [
-  {
-    id: "ia",
-    title: "Investment Analyst",
-    company: "Northbridge Capital",
-    meta: "Munich, Germany · Hybrid",
-    fit: "Strong match",
-    why: [
-      "Relevant financial modeling experience",
-      "Preferred location",
-      "Matching career interests",
-    ],
-    gap: "German language requirements need confirmation",
-  },
   {
     id: "se",
     title: "Software Engineer",
     company: "Northline",
     meta: "Berlin · Hybrid",
     fit: "Good match",
-    why: ["TypeScript and React in the stack", "Product-facing engineering"],
-    gap: "On-site days may be higher than preferred",
+    why: [
+      "This role sits close to Software Engineer.",
+      "The location matches your preference.",
+      "You cover TypeScript and React.",
+    ],
+    gap: "Hybrid office days need confirmation",
+  },
+  {
+    id: "sse",
+    title: "Senior Software Engineer",
+    company: "Northline",
+    meta: "Berlin · Hybrid",
+    fit: "Stretch opportunity",
+    why: [
+      "The title matches your search.",
+      "The location matches your preference.",
+    ],
+    gap: "The seniority is above your current level",
   },
 ];
 
@@ -43,8 +46,8 @@ export function DashboardPreview() {
           A smarter way to discover your next opportunity.
         </h2>
         <p className="mt-4 max-w-[52ch] text-[16px] leading-7 text-body">
-          One personalized workspace to discover, compare, and organize the
-          opportunities that matter to you.
+          Discover roles for your preferences, open the match, and save the ones
+          you want to track.
         </p>
 
         <div className="relative mt-10 overflow-hidden rounded-2xl bg-surface shadow-[0_16px_50px_rgba(17,24,39,0.07)] ring-1 ring-hairline">
@@ -57,9 +60,9 @@ export function DashboardPreview() {
               <ul className="mt-4 space-y-1 text-[13px] text-body">
                 {[
                   { icon: LayoutGrid, label: "Overview" },
-                  { icon: Search, label: "Discover", active: true },
-                  { icon: Bookmark, label: "Saved" },
-                  { icon: Sparkles, label: "Copilot" },
+                  { icon: Search, label: "Discover jobs", active: true },
+                  { icon: Bookmark, label: "Saved jobs" },
+                  { icon: Send, label: "Applications" },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -80,7 +83,7 @@ export function DashboardPreview() {
             </aside>
             <div className="p-4 md:border-r md:border-hairline md:p-5">
               <div className="flex flex-wrap gap-2">
-                {["Most relevant", "Hybrid", "Junior"].map((chip) => (
+                {["Most relevant", "Berlin", "Hybrid"].map((chip) => (
                   <span
                     key={chip}
                     className="rounded-full bg-canvas px-2.5 py-1 text-[11px] font-medium text-ink ring-1 ring-hairline"
@@ -134,7 +137,7 @@ export function DashboardPreview() {
                   type="button"
                   className="inline-flex h-9 items-center rounded-xl bg-ink px-3 text-[12px] font-medium text-white"
                 >
-                  View Details
+                  Open job
                 </button>
                 <button
                   type="button"

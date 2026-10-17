@@ -24,9 +24,9 @@ export function LandingView() {
               Find a job that{" "}
               <span className="text-accent">actually fits</span> you.
             </h1>
-            <p className="rise rise-delay-2 mx-auto mt-5 max-w-[46ch] text-[17px] leading-7 text-body">
-              Create your profile once. We match you to roles based on your
-              experience — not just keywords.
+            <p className="rise rise-delay-2 mx-auto mt-5 max-w-[48ch] text-[17px] leading-7 text-body">
+              Create a profile, see roles ranked against it, then save them and
+              track each application through to an offer or a rejection.
             </p>
             <div className="rise rise-delay-3 mt-10">
               <JobSearch />

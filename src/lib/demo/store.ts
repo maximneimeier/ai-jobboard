@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { INBOX_REPLIES, statusForDecision } from "./inbox";
 import type { Employment, Industry, Level, WorkMode } from "./jobs";
 
 export type WorkExperience = {
@@ -138,6 +139,17 @@ export type JobFeedback = {
 
 export type DemoSort = "relevant" | "recent" | "salary";
 
+export type DemoPreferences = {
+  emailAlerts: boolean;
+  hidePassedJobs: boolean;
+};
+
+export type DemoInbox = {
+  connected: boolean;
+  address: string;
+  priorStatus: Partial<Record<string, ApplicationStatus>>;
+};
+
 export type DemoState = {
   query: string;
   location: string;
@@ -155,6 +167,8 @@ export type DemoState = {
   jobFeedback: JobFeedback[];
   workspaceSeeded: boolean;
   alerts: JobAlert[];
+  preferences: DemoPreferences;
+  inbox: DemoInbox;
 };
 
 function newId(prefix: string) {
@@ -305,6 +319,8 @@ export const INITIAL_STATE: DemoState = {
   jobFeedback: [],
   workspaceSeeded: false,
   alerts: [],
+  preferences: { emailAlerts: true, hidePassedJobs: true },
+  inbox: { connected: false, address: "", priorStatus: {} },
 };
 
 let rawCache: string | null = null;
@@ -539,6 +555,8 @@ function parse(raw: string | null): DemoState {
             .map(parseAlert)
             .filter((item): item is JobAlert => Boolean(item))
         : [],
+      preferences: parsePreferences(data.preferences),
+      inbox: parseInbox(data.inbox),
     };
   } catch {
     return INITIAL_STATE;
@@ -1042,6 +1060,12 @@ export function clearJobFeedback(jobId: string) {
   });
 }
 
+export function removeApplication(jobId: string) {
+  patch({
+    applications: load().applications.filter((item) => item.jobId !== jobId),
+  });
+}
+
 export function upsertApplication(
   jobId: string,
   update: Partial<Pick<DemoApplication, "status" | "notes" | "followUp" | "cv" | "letter">>,
@@ -1066,8 +1090,83 @@ export function upsertApplication(
   });
 }
 
+function parsePreferences(value: unknown): DemoPreferences {
+  const row =
+    value && typeof value === "object" ? (value as Partial<DemoPreferences>) : {};
+  return {
+    emailAlerts: row.emailAlerts !== false,
+    hidePassedJobs: row.hidePassedJobs !== false,
+  };
+}
+
+const EMPTY_INBOX: DemoInbox = { connected: false, address: "", priorStatus: {} };
+
+function parseInbox(value: unknown): DemoInbox {
+  const row = value && typeof value === "object" ? (value as Partial<DemoInbox>) : {};
+  const priorStatus: DemoInbox["priorStatus"] = {};
+  if (row.priorStatus && typeof row.priorStatus === "object") {
+    for (const [jobId, status] of Object.entries(row.priorStatus)) {
+      if (APPLICATION_STATUSES.includes(status as ApplicationStatus)) {
+        priorStatus[jobId] = status as ApplicationStatus;
+      }
+    }
+  }
+  return {
+    connected: Boolean(row.connected),
+    address: typeof row.address === "string" ? row.address : "",
+    priorStatus,
+  };
+}
+
+export function connectInbox() {
+  const current = load();
+  const address = current.email.trim();
+  if (!address) return false;
+  const priorStatus = { ...current.inbox.priorStatus };
+  const applications = current.applications.map((item) => {
+    const reply = INBOX_REPLIES.find((row) => row.jobId === item.jobId);
+    if (!reply) return item;
+    const nextStatus = statusForDecision(reply.decision);
+    if (item.status === nextStatus) return item;
+    if (!priorStatus[item.jobId]) priorStatus[item.jobId] = item.status;
+    return { ...item, status: nextStatus, updatedAt: Date.now() };
+  });
+  patch({
+    inbox: { connected: true, address, priorStatus },
+    applications,
+  });
+  return true;
+}
+
+export function disconnectInbox() {
+  const current = load();
+  const applications = current.applications.map((item) => {
+    const previous = current.inbox.priorStatus[item.jobId];
+    const reply = INBOX_REPLIES.find((row) => row.jobId === item.jobId);
+    if (!previous || !reply) return item;
+    if (item.status !== statusForDecision(reply.decision)) return item;
+    return { ...item, status: previous, updatedAt: Date.now() };
+  });
+  patch({ inbox: EMPTY_INBOX, applications });
+}
+
+export function setEmail(email: string) {
+  patch({ email: email.trim() });
+}
+
+export function setPreferences(partial: Partial<DemoPreferences>) {
+  patch({ preferences: { ...load().preferences, ...partial } });
+}
+
+export function clearPassedJobs() {
+  patch({
+    jobFeedback: load().jobFeedback.filter((item) => item.action !== "not_interested"),
+  });
+}
+
 export function signOut() {
-  patch({ signedUp: false, email: "", pendingSaveId: null });
+  disconnectInbox();
+  patch({ signedUp: false, email: "", pendingSaveId: null, inbox: EMPTY_INBOX });
 }
 
 export function resetDemo() {
