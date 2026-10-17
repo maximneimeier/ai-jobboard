@@ -12,10 +12,24 @@ export function OnboardingPage() {
   return (
     <div className="mx-auto w-full max-w-[760px] px-5 py-10 md:px-8">
       {manual ? (
-        <ProfileReview profile={profile} onChange={setProfile} />
+        <>
+          <button
+            type="button"
+            onClick={() => setManual(false)}
+            className="text-[13px] text-muted hover:text-ink"
+          >
+            ← Back
+          </button>
+          <div className="mt-4">
+            <ProfileReview profile={profile} onChange={setProfile} />
+          </div>
+        </>
       ) : (
         <>
-          <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
+          <Link href="/signup" className="text-[13px] text-muted hover:text-ink">
+            ← Back
+          </Link>
+          <p className="mt-4 text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
             Create your profile
           </p>
           <h1 className="font-display mt-2 text-[32px] font-semibold tracking-[-0.32px] text-ink">

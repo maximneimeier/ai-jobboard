@@ -18,7 +18,6 @@ import { ActiveFilterChips, JobFilterSidebar } from "./job-filter-sidebar";
 import { JobMatchPanel } from "./job-match-panel";
 import { JobResultCard } from "./job-result-card";
 import { MatchContextBar } from "./match-context-bar";
-import { SignupModal } from "./signup-modal";
 
 type JobsView = "best" | "discover";
 
@@ -33,7 +32,6 @@ export function ResultsBoard({
 }) {
   const demo = useDemo();
   const router = useRouter();
-  const [signupOpen, setSignupOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<JobsView>("best");
   const [openJobId, setOpenJobId] = useState<string | null>(null);
@@ -86,8 +84,7 @@ export function ResultsBoard({
     : location;
 
   function onSave(jobId: string) {
-    const result = toggleSave(jobId);
-    if (result.needsSignup) setSignupOpen(true);
+    toggleSave(jobId);
   }
 
   function onFeedback(jobId: string, action: FeedbackAction, reason?: FeedbackReason) {
@@ -223,10 +220,6 @@ export function ResultsBoard({
         />
       ) : null}
 
-      <SignupModal
-        open={signupOpen || Boolean(demo.pendingSaveId)}
-        onDone={() => setSignupOpen(false)}
-      />
     </div>
   );
 }

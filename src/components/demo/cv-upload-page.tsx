@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Check, FileText } from "lucide-react";
 import { SAMPLE_PROFILE, type CareerProfile } from "@/lib/demo/store";
 import { ProfileReview } from "./profile-review";
@@ -34,6 +35,10 @@ export function CvUploadPage() {
 
   return (
     <div className="mx-auto w-full max-w-[760px] px-5 py-10 md:px-8">
+      <Link href="/onboarding" className="text-[13px] text-muted hover:text-ink">
+        ← Back
+      </Link>
+      <div className="mt-4">
       {reading ? (
         <div className="py-16 text-center">
           <p className="text-[16px] text-body">Reading {file.name}…</p>
@@ -78,6 +83,7 @@ export function CvUploadPage() {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }

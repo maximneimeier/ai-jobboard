@@ -1,25 +1,8 @@
-import type { Metadata } from "next";
-import { ApplicationEditor } from "@/components/landing/application-editor";
-import { SiteFooter } from "@/components/landing/site-footer";
-import { SiteNav } from "@/components/landing/site-nav";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Application | Atheniks Career Copilot",
-  description: "Resume and cover letter for a saved job.",
-};
-
-export default async function ApplicationRoute({
+export default async function GemerktApplicationRoute({
   params,
 }: PageProps<"/gemerkt/[id]">) {
   const { id } = await params;
-
-  return (
-    <div className="flex min-h-full flex-col bg-canvas">
-      <SiteNav />
-      <main className="flex flex-1 flex-col">
-        <ApplicationEditor jobId={id} />
-      </main>
-      <SiteFooter />
-    </div>
-  );
+  redirect(`/konto/gemerkt/${id}`);
 }

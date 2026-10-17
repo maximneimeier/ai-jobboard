@@ -54,12 +54,20 @@ export function SiteNav() {
               Account
             </Link>
           ) : (
-            <Link
-              href="/signup"
-              className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
-            >
-              Create your profile
-            </Link>
+            <>
+              <Link
+                href="/signin"
+                className="inline-flex h-9 items-center rounded-md px-3.5 text-[14px] font-medium tracking-[-0.16px] text-ink"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
+              >
+                Create your profile
+              </Link>
+            </>
           )}
         </div>
 
@@ -103,13 +111,32 @@ export function SiteNav() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href={signedUp ? "/konto" : "/signup"}
-              className="text-[14px] font-medium"
-              onClick={() => setOpen(false)}
-            >
-              {signedUp ? "Account" : "Create your profile"}
-            </Link>
+            {signedUp ? (
+              <Link
+                href="/konto"
+                className="text-[14px] font-medium"
+                onClick={() => setOpen(false)}
+              >
+                Account
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="text-[14px] font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-[14px] font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  Create your profile
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       ) : null}

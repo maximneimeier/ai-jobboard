@@ -55,8 +55,36 @@ export type DemoApplication = {
   status: ApplicationStatus;
   notes: string;
   followUp: string;
+  cv: string;
+  letter: string;
   updatedAt: number;
 };
+
+const APPLICATION_STATUSES: ApplicationStatus[] = [
+  "interested",
+  "preparing",
+  "applied",
+  "interview",
+  "offer",
+  "rejected",
+];
+
+function parseApplication(item: unknown): DemoApplication | null {
+  const row = asObject(item);
+  if (!row || typeof row.jobId !== "string") return null;
+  const status = APPLICATION_STATUSES.includes(row.status as ApplicationStatus)
+    ? (row.status as ApplicationStatus)
+    : "preparing";
+  return {
+    jobId: row.jobId,
+    status,
+    notes: typeof row.notes === "string" ? row.notes : "",
+    followUp: typeof row.followUp === "string" ? row.followUp : "",
+    cv: typeof row.cv === "string" ? row.cv : "",
+    letter: typeof row.letter === "string" ? row.letter : "",
+    updatedAt: typeof row.updatedAt === "number" ? row.updatedAt : Date.now(),
+  };
+}
 
 export type FitFilter = "strong" | "good" | "stretch" | "review";
 
@@ -469,10 +497,9 @@ function parse(raw: string | null): DemoState {
       signedUp: Boolean(data.signedUp),
       email: typeof data.email === "string" ? data.email : "",
       applications: Array.isArray(data.applications)
-        ? data.applications.filter(
-            (item): item is DemoApplication =>
-              Boolean(item && typeof item.jobId === "string"),
-          )
+        ? data.applications
+            .map(parseApplication)
+            .filter((item): item is DemoApplication => Boolean(item))
         : [],
       pendingSaveId:
         typeof data.pendingSaveId === "string" ? data.pendingSaveId : null,
@@ -791,6 +818,8 @@ export function setJobFeedback(
         status: existing?.status && existing.status !== "interested" ? existing.status : "interested",
         notes: existing?.notes ?? "",
         followUp: existing?.followUp ?? "",
+        cv: existing?.cv ?? "",
+        letter: existing?.letter ?? "",
         updatedAt: Date.now(),
       },
       ...current.applications.filter((item) => item.jobId !== jobId),
@@ -810,7 +839,7 @@ export function clearJobFeedback(jobId: string) {
 
 export function upsertApplication(
   jobId: string,
-  update: Partial<Pick<DemoApplication, "status" | "notes" | "followUp">>,
+  update: Partial<Pick<DemoApplication, "status" | "notes" | "followUp" | "cv" | "letter">>,
 ) {
   const current = load();
   const existing = current.applications.find((item) => item.jobId === jobId);
@@ -819,6 +848,8 @@ export function upsertApplication(
     status: update.status ?? existing?.status ?? "preparing",
     notes: update.notes ?? existing?.notes ?? "",
     followUp: update.followUp ?? existing?.followUp ?? "",
+    cv: update.cv ?? existing?.cv ?? "",
+    letter: update.letter ?? existing?.letter ?? "",
     updatedAt: Date.now(),
   };
   const savedIds = current.savedIds.includes(jobId)
@@ -828,6 +859,10 @@ export function upsertApplication(
     savedIds,
     applications: [next, ...current.applications.filter((item) => item.jobId !== jobId)],
   });
+}
+
+export function signOut() {
+  patch({ signedUp: false, email: "", pendingSaveId: null });
 }
 
 export function resetDemo() {

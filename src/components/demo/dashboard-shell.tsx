@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/landing/logo";
 import { useDemo } from "@/lib/demo/store";
 
@@ -27,8 +27,27 @@ function jobsHref(query: string, location: string) {
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
+  const router = useRouter();
   const demo = useDemo();
   const [open, setOpen] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!demo.signedUp) router.replace("/signin");
+  }, [demo.signedUp, ready, router]);
+
+  if (!ready || !demo.signedUp) {
+    return (
+      <div className="flex min-h-full items-center justify-center bg-canvas px-5">
+        <p className="text-[14px] text-muted">Opening your account…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-full bg-canvas">

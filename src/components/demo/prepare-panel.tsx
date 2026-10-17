@@ -65,6 +65,16 @@ export function PreparePanel({
             type="button"
             onClick={() => {
               upsertApplication(jobId, { status: "preparing", notes });
+              window.location.assign(`/konto/gemerkt/${jobId}`);
+            }}
+            className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Write resume and cover letter
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              upsertApplication(jobId, { status: "preparing", notes });
               window.location.assign("/konto/bewerbungen");
             }}
             className="inline-flex h-10 items-center rounded-md px-4 text-[14px] ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-accent"
@@ -77,7 +87,7 @@ export function PreparePanel({
               upsertApplication(jobId, { status: "applied", notes });
               window.location.assign("/konto/bewerbungen");
             }}
-            className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex h-10 items-center rounded-md px-4 text-[14px] ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-accent"
           >
             Mark as applied
           </button>

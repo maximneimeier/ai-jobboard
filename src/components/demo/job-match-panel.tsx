@@ -32,7 +32,6 @@ export function JobMatchPanel({
   onClose: () => void;
   onSave: () => void;
 }) {
-  const [sourceOpen, setSourceOpen] = useState(false);
   const [prepareOpen, setPrepareOpen] = useState(false);
   const analysis = analyzeMatch(job, profile);
 
@@ -122,13 +121,6 @@ export function JobMatchPanel({
               className="inline-flex h-9 items-center rounded-lg bg-ink px-3 text-[13px] font-medium text-white"
             >
               Apply
-            </button>
-            <button
-              type="button"
-              onClick={() => setSourceOpen(true)}
-              className="inline-flex h-9 items-center rounded-lg px-3 text-[13px] text-muted hover:text-ink"
-            >
-              Original posting
             </button>
           </div>
 
@@ -247,25 +239,6 @@ export function JobMatchPanel({
           </Section>
         </div>
       </aside>
-
-      {sourceOpen ? (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center bg-ink/40 p-4">
-          <div className="max-w-md rounded-lg bg-surface p-6 ring-1 ring-hairline">
-            <h3 className="text-[16px] font-medium text-ink">Original posting</h3>
-            <p className="mt-3 text-[14px] leading-6 text-body">
-              Continue to the {job.company} careers page to view the original posting
-              and apply.
-            </p>
-            <button
-              type="button"
-              onClick={() => setSourceOpen(false)}
-              className="mt-5 inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white"
-            >
-              Got it
-            </button>
-          </div>
-        </div>
-      ) : null}
 
       {prepareOpen ? (
         <PreparePanel

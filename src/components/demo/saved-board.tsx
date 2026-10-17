@@ -36,12 +36,18 @@ export function SavedBoard() {
                 <p className="mt-1 text-[14px] text-body">
                   {job.company} · {job.location} · {salaryLabel(job)}
                 </p>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Link
                     href={`/jobs/${job.id}`}
+                    className="inline-flex h-9 items-center rounded-md px-3 text-[13px] ring-1 ring-hairline"
+                  >
+                    Open job
+                  </Link>
+                  <Link
+                    href={`/konto/gemerkt/${job.id}`}
                     className="inline-flex h-9 items-center rounded-md bg-ink px-3 text-[13px] text-white"
                   >
-                    Open
+                    Prepare application
                   </Link>
                   <button
                     type="button"

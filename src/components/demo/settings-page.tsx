@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { resetDemo, useDemo } from "@/lib/demo/store";
+import { resetDemo, signOut, useDemo } from "@/lib/demo/store";
 import { DemoBanner } from "./demo-banner";
 
 export function SettingsPage() {
@@ -25,16 +25,28 @@ export function SettingsPage() {
       <p className="mt-6 text-[15px] text-body">
         Account: {demo.signedUp ? demo.email || "Signed in" : "Not signed in"}
       </p>
-      <button
-        type="button"
-        onClick={() => {
-          resetDemo();
-          router.push("/");
-        }}
-        className="mt-6 inline-flex h-11 items-center rounded-md bg-ink px-4 text-[14px] text-white"
-      >
-        Clear saved data
-      </button>
+      <div className="mt-6 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            signOut();
+            router.push("/");
+          }}
+          className="inline-flex h-11 items-center rounded-md bg-ink px-4 text-[14px] text-white"
+        >
+          Sign out
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            resetDemo();
+            router.push("/");
+          }}
+          className="inline-flex h-11 items-center rounded-md px-4 text-[14px] text-ink ring-1 ring-hairline"
+        >
+          Clear saved data
+        </button>
+      </div>
     </div>
   );
 }

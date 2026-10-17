@@ -15,13 +15,10 @@ import {
 import { toggleSave, upsertApplication, useDemo } from "@/lib/demo/store";
 import { MatchBadge } from "./match-badge";
 import { PreparePanel } from "./prepare-panel";
-import { SignupModal } from "./signup-modal";
 import { SkillChecks } from "./skill-checks";
 
 export function JobArticle({ jobId }: { jobId: string }) {
   const demo = useDemo();
-  const [signupOpen, setSignupOpen] = useState(false);
-  const [sourceOpen, setSourceOpen] = useState(false);
   const [prepareOpen, setPrepareOpen] = useState(false);
   const job = demoJobById(jobId);
   const ranked = useMemo(() => {
@@ -61,8 +58,7 @@ export function JobArticle({ jobId }: { jobId: string }) {
   const listing = job;
 
   function save() {
-    const result = toggleSave(listing.id);
-    if (result.needsSignup) setSignupOpen(true);
+    toggleSave(listing.id);
   }
 
   function prepare() {
@@ -109,13 +105,6 @@ export function JobArticle({ jobId }: { jobId: string }) {
           className="inline-flex h-11 items-center rounded-md px-4 text-[14px] font-medium text-ink ring-1 ring-hairline"
         >
           Prepare application
-        </button>
-        <button
-          type="button"
-          onClick={() => setSourceOpen(true)}
-          className="inline-flex h-11 items-center rounded-md px-4 text-[14px] text-muted"
-        >
-          View original posting
         </button>
       </div>
 
@@ -176,25 +165,6 @@ export function JobArticle({ jobId }: { jobId: string }) {
         ) : null}
       </div>
 
-      {sourceOpen ? (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/30 p-4">
-          <div className="max-w-md rounded-lg bg-surface p-6 ring-1 ring-hairline">
-            <h2 className="text-[18px] font-medium text-ink">Original posting</h2>
-            <p className="mt-3 text-[15px] leading-6 text-body">
-              Continue to the {job.company} careers page to view the original
-              posting and apply.
-            </p>
-            <button
-              type="button"
-              onClick={() => setSourceOpen(false)}
-              className="mt-5 inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white"
-            >
-              Got it
-            </button>
-          </div>
-        </div>
-      ) : null}
-
       {prepareOpen ? (
         <PreparePanel
           jobTitle={job.title}
@@ -203,10 +173,6 @@ export function JobArticle({ jobId }: { jobId: string }) {
         />
       ) : null}
 
-      <SignupModal
-        open={signupOpen || Boolean(demo.pendingSaveId)}
-        onDone={() => setSignupOpen(false)}
-      />
     </article>
   );
 }

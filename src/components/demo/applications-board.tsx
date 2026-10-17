@@ -92,12 +92,20 @@ export function ApplicationsBoard() {
               <p className="text-[12px] text-muted">Details</p>
               <h2 className="mt-1 text-[17px] font-medium text-ink">{job.title}</h2>
               <p className="mt-1 text-[14px] text-body">{job.company}</p>
-              <Link
-                href={`/jobs/${job.id}`}
-                className="mt-3 inline-flex text-[13px] text-ink underline"
-              >
-                Open job
-              </Link>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <Link
+                  href={`/jobs/${job.id}`}
+                  className="inline-flex text-[13px] text-ink underline"
+                >
+                  Open job
+                </Link>
+                <Link
+                  href={`/konto/gemerkt/${job.id}`}
+                  className="inline-flex text-[13px] text-ink underline"
+                >
+                  Resume and cover letter
+                </Link>
+              </div>
               <label className="mt-5 grid gap-1 text-[12px] font-medium text-muted">
                 Status
                 <select

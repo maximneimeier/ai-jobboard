@@ -174,7 +174,7 @@ export function downloadApplicationPdf({
   cv: string;
   letter: string;
 }) {
-  const filename = `${sanitizeFilename(`Bewerbung-${company}-${role}-${name}`) || "Bewerbung"}.pdf`;
+  const filename = `${sanitizeFilename(`Application-${company}-${role}-${name}`) || "Application"}.pdf`;
   const bytes = buildPdf([
     { blocks: parseDocument(cv, true) },
     { blocks: parseDocument(letter, false) },

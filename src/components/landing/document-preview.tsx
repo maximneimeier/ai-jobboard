@@ -12,7 +12,7 @@ export function DocumentPreview({
   return (
     <div className="print-sheet min-h-[640px] rounded-lg bg-canvas px-6 py-8 ring-1 ring-hairline-soft md:px-10 md:py-10">
       {blocks.length === 0 ? (
-        <p className="text-[14px] text-muted">Noch kein Text.</p>
+        <p className="text-[14px] text-muted">No text yet.</p>
       ) : (
         blocks.map((block, index) => {
           if (block.type === "title") {

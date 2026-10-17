@@ -13,7 +13,7 @@ const STEPS = [
     step: "02",
     icon: Sparkles,
     title: "See jobs that fit",
-    text: "We rank open roles against your profile and explain why each one may be a strong, potential, or stretch fit.",
+    text: "We rank open roles against your profile and explain why each one may be a strong, good, or stretch fit.",
   },
   {
     step: "03",

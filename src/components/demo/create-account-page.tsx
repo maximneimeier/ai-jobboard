@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { completeSignup } from "@/lib/demo/store";
 
@@ -63,6 +64,12 @@ export function CreateAccountPage() {
           {busy ? "Creating account…" : "Continue"}
         </button>
       </form>
+      <p className="mt-6 text-[14px] text-body">
+        Already have an account?{" "}
+        <Link href="/signin" className="font-medium text-ink underline">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

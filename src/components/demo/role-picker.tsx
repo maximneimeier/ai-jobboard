@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   EMPLOYMENT_LABEL,
@@ -127,7 +128,10 @@ export function RolePicker() {
 
   return (
     <div className="mx-auto w-full max-w-[760px] px-5 py-10 md:px-8">
-      <p className="text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
+      <Link href="/onboarding" className="text-[13px] text-muted hover:text-ink">
+        ← Back
+      </Link>
+      <p className="mt-4 text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
         Job preferences
       </p>
       <h1 className="font-display mt-2 text-[32px] font-semibold tracking-[-0.32px] text-ink">

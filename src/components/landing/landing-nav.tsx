@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { SignupModal } from "@/components/demo/signup-modal";
 import { useDemo } from "@/lib/demo/store";
 import { Logo } from "./logo";
 
@@ -15,7 +14,6 @@ const LINKS = [
 
 export function LandingNav() {
   const [open, setOpen] = useState(false);
-  const [signup, setSignup] = useState(false);
   const [ready, setReady] = useState(false);
   const demo = useDemo();
   useEffect(() => {
@@ -24,8 +22,7 @@ export function LandingNav() {
   const signedUp = ready && demo.signedUp;
 
   return (
-    <>
-      <header className="sticky top-0 z-40 border-b border-hairline bg-surface/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-hairline bg-surface/90 backdrop-blur-md">
         <div className="mx-auto grid h-16 w-full max-w-[1120px] grid-cols-[1fr_auto] items-center px-5 md:h-[72px] md:grid-cols-[1fr_auto_1fr] md:px-8">
           <Link href="/" onClick={() => setOpen(false)}>
             <Logo label="Atheniks" />
@@ -50,13 +47,12 @@ export function LandingNav() {
                 Account
               </Link>
             ) : (
-              <button
-                type="button"
-                onClick={() => setSignup(true)}
+              <Link
+                href="/signin"
                 className="inline-flex h-9 items-center rounded-xl px-3.5 text-[14px] font-medium text-ink transition hover:bg-canvas"
               >
                 Sign In
-              </button>
+              </Link>
             )}
             <Link
               href="/signup"
@@ -93,16 +89,13 @@ export function LandingNav() {
                   Account
                 </Link>
               ) : (
-                <button
-                  type="button"
-                  className="text-left text-[14px] font-medium"
-                  onClick={() => {
-                    setOpen(false);
-                    setSignup(true);
-                  }}
+                <Link
+                  href="/signin"
+                  className="text-[14px] font-medium"
+                  onClick={() => setOpen(false)}
                 >
                   Sign In
-                </button>
+                </Link>
               )}
               <Link
                 href="/signup"
@@ -114,8 +107,6 @@ export function LandingNav() {
             </nav>
           </div>
         ) : null}
-      </header>
-      <SignupModal open={signup} onDone={() => setSignup(false)} />
-    </>
+    </header>
   );
 }
