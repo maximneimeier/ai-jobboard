@@ -11,4 +11,11 @@ export const paths = {
   signup: "/signup",
   jobs: "/jobs",
   job: (id: string) => `/jobs/${id}`,
+  jobsSearch: (role?: string, location?: string) => {
+    const params = new URLSearchParams();
+    if (role && role !== "Open search") params.set("role", role);
+    if (location && location !== "Any location") params.set("location", location);
+    const qs = params.toString();
+    return qs ? `/jobs?${qs}` : "/jobs";
+  },
 } as const;

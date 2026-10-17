@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 
 export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -20,6 +21,7 @@ export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       className={`flex w-full flex-col gap-2 ${stacked ? "" : "max-w-md sm:flex-row"}`}
     >
@@ -29,8 +31,11 @@ export function WaitlistForm({ stacked = false }: { stacked?: boolean }) {
       <input
         id="waitlist-email"
         name="email"
-        type="email"
-        required
+        type="text"
+        inputMode="email"
+        autoComplete="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
         placeholder="Email address"
         className="h-11 w-full rounded-xl bg-canvas px-3.5 text-[15px] tracking-[-0.16px] text-ink ring-1 ring-hairline outline-none placeholder:text-muted-soft focus:ring-2 focus:ring-accent"
       />

@@ -38,7 +38,10 @@ export function SiteNav() {
             >
               {link.label}
               {link.label === "Saved" && saved ? (
-                <span className="ml-1.5 rounded-md bg-surface-soft px-1.5 text-[11px]">
+                <span
+                  suppressHydrationWarning
+                  className="ml-1.5 rounded-md bg-surface-soft px-1.5 text-[11px]"
+                >
                   {saved}
                 </span>
               ) : null}

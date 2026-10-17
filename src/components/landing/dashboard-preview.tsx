@@ -60,19 +60,22 @@ export function DashboardPreview() {
                   { icon: Search, label: "Discover", active: true },
                   { icon: Bookmark, label: "Saved" },
                   { icon: Sparkles, label: "Copilot" },
-                ].map((item) => (
-                  <li
-                    key={item.label}
-                    className={
-                      item.active
-                        ? "flex items-center gap-2 rounded-xl bg-surface px-3 py-2 font-medium text-ink ring-1 ring-hairline"
-                        : "flex items-center gap-2 rounded-xl px-3 py-2"
-                    }
-                  >
-                    <item.icon size={14} />
-                    {item.label}
-                  </li>
-                ))}
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <li
+                      key={item.label}
+                      className={
+                        item.active
+                          ? "flex items-center gap-2 rounded-xl bg-surface px-3 py-2 font-medium text-ink ring-1 ring-hairline"
+                          : "flex items-center gap-2 rounded-xl px-3 py-2"
+                      }
+                    >
+                      <Icon size={14} />
+                      {item.label}
+                    </li>
+                  );
+                })}
               </ul>
             </aside>
             <div className="p-4 md:border-r md:border-hairline md:p-5">
@@ -124,7 +127,7 @@ export function DashboardPreview() {
                   <li key={line}>· {line}</li>
                 ))}
               </ul>
-              <p className="mt-4 text-[12px] font-medium text-ink">Potential gap</p>
+              <p className="mt-4 text-[12px] font-medium text-ink">Needs confirmation</p>
               <p className="mt-1 text-[13px] text-body">· {job.gap}</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <button

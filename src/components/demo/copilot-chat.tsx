@@ -1,18 +1,43 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { COPILOT_PROMPTS, copilotReply, type CopilotMessage } from "@/lib/demo/copilot";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  copilotPrompts,
+  copilotReply,
+  openingMessage,
+  type CopilotMessage,
+} from "@/lib/demo/copilot";
+import { useDemo } from "@/lib/demo/store";
 import { DemoBanner } from "./demo-banner";
 
 export function CopilotChat() {
-  const [messages, setMessages] = useState<CopilotMessage[]>([
+  const demo = useDemo();
+  const ctx = useMemo(
+    () => ({
+      profile: demo.profile,
+      savedIds: demo.savedIds,
+      applications: demo.applications,
+      roleTags: demo.roleTags,
+      locationTags: demo.locationTags,
+    }),
+    [demo.applications, demo.locationTags, demo.profile, demo.roleTags, demo.savedIds],
+  );
+  const prompts = useMemo(() => copilotPrompts(ctx), [ctx]);
+  const [messages, setMessages] = useState<CopilotMessage[]>(() => [
     {
       id: "hello",
       role: "assistant",
-      text: "Ask about fit, similar roles, or what to do next. Start with one of the prompts below.",
+      text: openingMessage(ctx),
     },
   ]);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    setMessages((current) => {
+      if (current.length !== 1 || current[0]?.id !== "hello") return current;
+      return [{ id: "hello", role: "assistant", text: openingMessage(ctx) }];
+    });
+  }, [ctx]);
 
   function ask(prompt: string) {
     const user: CopilotMessage = {
@@ -23,7 +48,7 @@ export function CopilotChat() {
     const assistant: CopilotMessage = {
       id: `a-${Date.now()}`,
       role: "assistant",
-      text: copilotReply(prompt),
+      text: copilotReply(prompt, ctx),
     };
     setMessages((current) => [...current, user, assistant]);
     setInput("");
@@ -46,7 +71,7 @@ export function CopilotChat() {
       </h1>
       <div className="mt-4">
         <DemoBanner>
-          Answers use your profile and the roles currently in your search.
+          Answers use your profile, saved jobs, and what is already in your tracker.
         </DemoBanner>
       </div>
       <div className="mt-6 flex-1 space-y-4">
@@ -68,7 +93,7 @@ export function CopilotChat() {
         ))}
       </div>
       <div className="mt-6 flex flex-wrap gap-2">
-        {COPILOT_PROMPTS.map((prompt) => (
+        {prompts.map((prompt) => (
           <button
             key={prompt}
             type="button"
@@ -79,7 +104,7 @@ export function CopilotChat() {
           </button>
         ))}
       </div>
-      <form onSubmit={onSubmit} className="mt-4 flex gap-2">
+      <form noValidate onSubmit={onSubmit} className="mt-4 flex gap-2">
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}

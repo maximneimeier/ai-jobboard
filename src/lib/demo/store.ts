@@ -60,6 +60,14 @@ export type DemoApplication = {
   updatedAt: number;
 };
 
+export type JobAlert = {
+  id: string;
+  role: string;
+  location: string;
+  enabled: boolean;
+  newMatches: number;
+};
+
 const APPLICATION_STATUSES: ApplicationStatus[] = [
   "interested",
   "preparing",
@@ -68,6 +76,18 @@ const APPLICATION_STATUSES: ApplicationStatus[] = [
   "offer",
   "rejected",
 ];
+
+function parseAlert(item: unknown): JobAlert | null {
+  const row = asObject(item);
+  if (!row || typeof row.id !== "string") return null;
+  return {
+    id: row.id,
+    role: typeof row.role === "string" ? row.role : "",
+    location: typeof row.location === "string" ? row.location : "",
+    enabled: row.enabled !== false,
+    newMatches: typeof row.newMatches === "number" ? row.newMatches : 0,
+  };
+}
 
 function parseApplication(item: unknown): DemoApplication | null {
   const row = asObject(item);
@@ -134,6 +154,7 @@ export type DemoState = {
   pendingSaveId: string | null;
   jobFeedback: JobFeedback[];
   workspaceSeeded: boolean;
+  alerts: JobAlert[];
 };
 
 function newId(prefix: string) {
@@ -283,6 +304,7 @@ export const INITIAL_STATE: DemoState = {
   pendingSaveId: null,
   jobFeedback: [],
   workspaceSeeded: false,
+  alerts: [],
 };
 
 let rawCache: string | null = null;
@@ -512,6 +534,11 @@ function parse(raw: string | null): DemoState {
           )
         : [],
       workspaceSeeded: Boolean(data.workspaceSeeded),
+      alerts: Array.isArray(data.alerts)
+        ? data.alerts
+            .map(parseAlert)
+            .filter((item): item is JobAlert => Boolean(item))
+        : [],
     };
   } catch {
     return INITIAL_STATE;
@@ -848,7 +875,34 @@ function workspaceSeed(current: DemoState): Partial<DemoState> {
     applications: current.applications.length
       ? current.applications
       : seededApplications(),
+    alerts: current.alerts.length ? current.alerts : seededAlerts(),
   };
+}
+
+function seededAlerts(): JobAlert[] {
+  return [
+    {
+      id: "alert-se-berlin",
+      role: "Software Engineer",
+      location: "Berlin",
+      enabled: true,
+      newMatches: 3,
+    },
+    {
+      id: "alert-fe-amsterdam",
+      role: "Frontend Engineer",
+      location: "Amsterdam",
+      enabled: true,
+      newMatches: 1,
+    },
+    {
+      id: "alert-fs-remote",
+      role: "Full Stack Engineer",
+      location: "Remote",
+      enabled: false,
+      newMatches: 0,
+    },
+  ];
 }
 
 export function completeSignup(email = "alex@gmail.com") {
@@ -878,10 +932,53 @@ export function completeSignIn(email = "alex@gmail.com") {
 
 export function ensureWorkspace() {
   const current = load();
-  if (!current.signedUp || current.workspaceSeeded) return;
+  if (!current.signedUp) return;
+  if (!current.workspaceSeeded) {
+    patch({
+      ...workspaceSeed(current),
+      workspaceSeeded: true,
+    });
+    return;
+  }
+  if (!current.alerts.length) {
+    patch({ alerts: seededAlerts() });
+  }
+}
+
+export function toggleAlert(id: string) {
   patch({
-    ...workspaceSeed(current),
-    workspaceSeeded: true,
+    alerts: load().alerts.map((item) =>
+      item.id === id ? { ...item, enabled: !item.enabled } : item,
+    ),
+  });
+}
+
+export function removeAlert(id: string) {
+  patch({
+    alerts: load().alerts.filter((item) => item.id !== id),
+  });
+}
+
+export function addAlert(role: string, location: string) {
+  const nextRole = role.trim();
+  const nextLocation = location.trim();
+  if (!nextRole && !nextLocation) return;
+  const current = load();
+  const alert: JobAlert = {
+    id: newId("alert"),
+    role: nextRole || "Open search",
+    location: nextLocation || "Any location",
+    enabled: true,
+    newMatches: 2,
+  };
+  patch({ alerts: [alert, ...current.alerts] });
+}
+
+export function clearAlertMatches(id: string) {
+  patch({
+    alerts: load().alerts.map((item) =>
+      item.id === id ? { ...item, newMatches: 0 } : item,
+    ),
   });
 }
 
