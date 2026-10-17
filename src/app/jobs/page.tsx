@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { ResultsBoard } from "@/components/demo/results-board";
-import { SiteFooter } from "@/components/landing/site-footer";
-import { SiteNav } from "@/components/landing/site-nav";
 
 export const metadata: Metadata = {
   title: "Jobs | Atheniks Career Copilot",
@@ -17,16 +15,10 @@ export default async function JobsPage({
   const personalize = query.personalize === "1";
 
   return (
-    <div className="flex min-h-full flex-col bg-canvas">
-      <SiteNav />
-      <main className="flex-1">
-        <ResultsBoard
-          initialRole={role}
-          initialLocation={location}
-          openPersonalize={personalize}
-        />
-      </main>
-      <SiteFooter />
-    </div>
+    <ResultsBoard
+      initialRole={role}
+      initialLocation={location}
+      openPersonalize={personalize}
+    />
   );
 }

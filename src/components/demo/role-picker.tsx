@@ -297,7 +297,7 @@ export function RolePicker() {
         onClick={finish}
         className="mt-8 inline-flex h-12 items-center rounded-xl bg-accent px-5 text-[15px] font-medium text-white transition hover:bg-accent-hover"
       >
-        See matching jobs
+        Save preferences
       </button>
     </div>
   );

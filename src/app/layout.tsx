@@ -25,8 +25,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${inter.variable} ${interTight.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full bg-canvas font-sans text-ink">{children}</body>
+      <body
+        className="min-h-full bg-canvas font-sans text-ink"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

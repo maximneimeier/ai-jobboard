@@ -3,19 +3,45 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  Bell,
+  Bookmark,
+  LayoutGrid,
+  Search,
+  Send,
+  Settings,
+  Sparkles,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { Logo } from "@/components/landing/logo";
 import { paths } from "@/lib/demo/paths";
 import { ensureWorkspace, useDemo } from "@/lib/demo/store";
 
-const NAV = [
-  { href: paths.account, label: "Overview" },
-  { href: paths.jobs, label: "Discover jobs" },
-  { href: paths.saved, label: "Saved jobs" },
-  { href: paths.applications, label: "Applications" },
-  { href: paths.copilot, label: "Career Copilot" },
-  { href: paths.alerts, label: "Job alerts" },
-  { href: paths.profile, label: "My profile" },
-  { href: paths.settings, label: "Settings" },
+const NAV: { label: string; items: { href: string; label: string; icon: LucideIcon }[] }[] = [
+  {
+    label: "Workspace",
+    items: [
+      { href: paths.account, label: "Overview", icon: LayoutGrid },
+      { href: paths.jobs, label: "Discover jobs", icon: Search },
+      { href: paths.saved, label: "Saved jobs", icon: Bookmark },
+      { href: paths.applications, label: "Applications", icon: Send },
+    ],
+  },
+  {
+    label: "Guidance",
+    items: [
+      { href: paths.copilot, label: "Career Copilot", icon: Sparkles },
+      { href: paths.alerts, label: "Job alerts", icon: Bell },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { href: paths.profile, label: "My profile", icon: UserRound },
+      { href: paths.settings, label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
 function jobsHref(query: string, location: string) {
@@ -30,7 +56,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const demo = useDemo();
-  const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -56,75 +81,56 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-full bg-canvas">
-      <aside className="hidden w-[240px] shrink-0 flex-col border-r border-hairline-soft bg-surface md:flex">
-        <div className="px-4 py-5">
+      <aside className="sticky top-0 flex h-dvh w-[232px] shrink-0 flex-col border-r border-hairline-soft bg-surface">
+        <div className="px-4 py-4">
           <Link href="/">
             <Logo compact />
           </Link>
         </div>
-        <nav className="flex flex-1 flex-col gap-0.5 px-3 pb-6">
-          {NAV.map((item) => {
-            const href =
-              item.href === paths.jobs
-                ? jobsHref(demo.query, demo.location)
-                : item.href;
-            const active =
-              item.href === paths.account
-                ? path === paths.account
-                : item.href === paths.jobs
-                  ? path.startsWith(paths.jobs)
-                  : path === item.href || path.startsWith(`${item.href}/`);
-            return (
-              <Link
-                key={item.href}
-                href={href}
-                className={
-                  active
-                    ? "rounded-md bg-canvas px-3 py-2 text-[14px] font-medium text-ink ring-1 ring-hairline-soft"
-                    : "rounded-md px-3 py-2 text-[14px] text-body hover:text-ink"
-                }
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 pb-4">
+          {NAV.map((group) => (
+            <div key={group.label}>
+              <p className="px-2.5 pb-1 text-[11px] font-medium tracking-[0.08em] text-muted uppercase">
+                {group.label}
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {group.items.map((item) => {
+                  const href =
+                    item.href === paths.jobs
+                      ? jobsHref(demo.query, demo.location)
+                      : item.href;
+                  const active =
+                    item.href === paths.account
+                      ? path === paths.account
+                      : item.href === paths.jobs
+                        ? path.startsWith(paths.jobs)
+                        : path === item.href || path.startsWith(`${item.href}/`);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={href}
+                      className={
+                        active
+                          ? "flex items-center gap-2.5 rounded-lg bg-canvas px-2.5 py-2 text-[14px] font-medium text-ink"
+                          : "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px] text-body hover:bg-canvas hover:text-ink"
+                      }
+                    >
+                      <Icon className="size-4 shrink-0" strokeWidth={1.75} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
-        <p className="px-4 pb-5 text-[12px] text-muted">
-          {demo.signedUp ? demo.email || "Your account" : "Guest"}
+        <p className="shrink-0 truncate border-t border-hairline-soft px-4 py-4 text-[12px] text-muted">
+          {demo.email || "Your account"}
         </p>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-hairline-soft bg-surface px-4 py-3 md:hidden">
-          <Link href="/">
-            <Logo compact />
-          </Link>
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            className="inline-flex h-9 items-center rounded-md px-3 text-[13px] ring-1 ring-hairline"
-          >
-            Menu
-          </button>
-        </header>
-        {open ? (
-          <nav className="border-b border-hairline-soft bg-surface px-3 py-3 md:hidden">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={
-                  item.href === paths.jobs
-                    ? jobsHref(demo.query, demo.location)
-                    : item.href
-                }
-                onClick={() => setOpen(false)}
-                className="block rounded-md px-3 py-2 text-[14px] text-ink"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        ) : null}
         <div className="flex-1">{children}</div>
       </div>
     </div>

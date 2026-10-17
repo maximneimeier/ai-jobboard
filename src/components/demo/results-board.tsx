@@ -77,12 +77,25 @@ export function ResultsBoard({
   const { best, discover } = splitJobs(visible, demo.personalized);
   const shown = view === "best" ? best : discover;
   const openJob = shown.concat(visible).find((job) => job.id === openJobId) ?? null;
-  const heading = demo.roleTags.length
-    ? demo.roleTags.join(", ")
-    : query || "Open search";
-  const place = demo.locationTags.length
-    ? demo.locationTags.join(", ")
-    : location;
+  const inWorkspace = demo.signedUp;
+  const heading =
+    demo.roleTags.length > 1
+      ? "Jobs for your preferences"
+      : demo.roleTags[0] || query || "Open search";
+  const place =
+    demo.roleTags.length > 1 || demo.locationTags.length > 1
+      ? ""
+      : demo.locationTags[0] || location;
+  const filterCount =
+    demo.roleTags.length +
+    demo.locationTags.length +
+    demo.filters.workModes.length +
+    demo.filters.levels.length +
+    demo.filters.employment.length +
+    demo.filters.industries.length +
+    (demo.filters.fits?.length ?? 0) +
+    (demo.filters.salaryMin ? 1 : 0) +
+    (demo.filters.maxAgeDays ? 1 : 0);
 
   function onSave(jobId: string) {
     toggleSave(jobId);
@@ -93,26 +106,36 @@ export function ResultsBoard({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 px-5 py-8 md:flex-row md:px-8">
-      <div className="md:hidden">
-        <button
-          type="button"
-          className="inline-flex h-10 items-center rounded-lg px-3 text-[14px] ring-1 ring-hairline"
-          onClick={() => setFiltersOpen(true)}
-        >
-          Filters
-        </button>
-      </div>
+    <div
+      className={
+        inWorkspace
+          ? "mx-auto flex w-full max-w-[920px] flex-col gap-6 px-5 py-8 md:px-8"
+          : "mx-auto flex w-full max-w-[1180px] flex-col gap-6 px-5 py-8 md:flex-row md:px-8"
+      }
+    >
+      {inWorkspace ? null : (
+        <div className="md:hidden">
+          <button
+            type="button"
+            className="inline-flex h-10 items-center rounded-lg px-3 text-[14px] ring-1 ring-hairline"
+            onClick={() => setFiltersOpen(true)}
+          >
+            Filters
+          </button>
+        </div>
+      )}
       <JobFilterSidebar
         filters={demo.filters}
         resultCount={visible.length}
         mobileOpen={filtersOpen}
         onCloseMobile={() => setFiltersOpen(false)}
         personalized={demo.personalized}
+        variant={inWorkspace ? "sheet" : "column"}
       />
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-1.5">
           <ViewTab
             href={undefined}
             active={view === "best"}
@@ -128,6 +151,21 @@ export function ResultsBoard({
             count={discover.length}
           />
           <ViewTab href={paths.applications} label="My applications" />
+          </div>
+          {inWorkspace ? (
+            <button
+              type="button"
+              className="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-hairline hover:bg-surface"
+              onClick={() => setFiltersOpen(true)}
+            >
+              Filters
+              {filterCount ? (
+                <span className="rounded-md bg-canvas px-1.5 text-[11px] text-muted">
+                  {filterCount}
+                </span>
+              ) : null}
+            </button>
+          ) : null}
         </div>
 
         <p className="mt-5 text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">
