@@ -4,17 +4,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/landing/logo";
-import { useDemo } from "@/lib/demo/store";
+import { paths } from "@/lib/demo/paths";
+import { ensureWorkspace, useDemo } from "@/lib/demo/store";
 
 const NAV = [
-  { href: "/konto", label: "Overview" },
-  { href: "/jobs", label: "Discover jobs" },
-  { href: "/konto/gemerkt", label: "Saved jobs" },
-  { href: "/konto/bewerbungen", label: "Applications" },
-  { href: "/konto/copilot", label: "Career Copilot" },
-  { href: "/konto/alerts", label: "Job alerts" },
-  { href: "/konto/profil", label: "My profile" },
-  { href: "/konto/einstellungen", label: "Settings" },
+  { href: paths.account, label: "Overview" },
+  { href: paths.jobs, label: "Discover jobs" },
+  { href: paths.saved, label: "Saved jobs" },
+  { href: paths.applications, label: "Applications" },
+  { href: paths.copilot, label: "Career Copilot" },
+  { href: paths.alerts, label: "Job alerts" },
+  { href: paths.profile, label: "My profile" },
+  { href: paths.settings, label: "Settings" },
 ];
 
 function jobsHref(query: string, location: string) {
@@ -38,7 +39,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    if (!demo.signedUp) router.replace("/signin");
+    if (!demo.signedUp) {
+      router.replace(paths.signin);
+      return;
+    }
+    ensureWorkspace();
   }, [demo.signedUp, ready, router]);
 
   if (!ready || !demo.signedUp) {
@@ -60,14 +65,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <nav className="flex flex-1 flex-col gap-0.5 px-3 pb-6">
           {NAV.map((item) => {
             const href =
-              item.href === "/jobs"
+              item.href === paths.jobs
                 ? jobsHref(demo.query, demo.location)
                 : item.href;
             const active =
-              item.href === "/konto"
-                ? path === "/konto"
-                : item.href === "/jobs"
-                  ? path.startsWith("/jobs")
+              item.href === paths.account
+                ? path === paths.account
+                : item.href === paths.jobs
+                  ? path.startsWith(paths.jobs)
                   : path === item.href || path.startsWith(`${item.href}/`);
             return (
               <Link
@@ -108,7 +113,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={
-                  item.href === "/jobs"
+                  item.href === paths.jobs
                     ? jobsHref(demo.query, demo.location)
                     : item.href
                 }

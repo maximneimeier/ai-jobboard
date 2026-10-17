@@ -1,10 +1,11 @@
+import { paths } from "@/lib/demo/paths";
 import { Logo } from "./logo";
 
 const links = [
-  { href: "/jobs", label: "Jobs" },
+  { href: paths.jobs, label: "Jobs" },
   { href: "/#how-it-works", label: "How it works" },
-  { href: "/konto/gemerkt", label: "Saved" },
-  { href: "/konto", label: "Account" },
+  { href: paths.saved, label: "Saved" },
+  { href: paths.account, label: "Account" },
   { href: "/#pricing", label: "Pricing" },
 ];
 

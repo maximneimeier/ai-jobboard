@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { rankDemoJobs, rankingHint, type RankedDemoJob } from "@/lib/demo/match";
+import { paths } from "@/lib/demo/paths";
 import {
   clearJobFeedback,
   setJobFeedback,
@@ -126,7 +127,7 @@ export function ResultsBoard({
             label="Discover"
             count={discover.length}
           />
-          <ViewTab href="/konto/bewerbungen" label="My applications" />
+          <ViewTab href={paths.applications} label="My applications" />
         </div>
 
         <p className="mt-5 text-[12px] font-semibold tracking-[0.72px] text-muted uppercase">

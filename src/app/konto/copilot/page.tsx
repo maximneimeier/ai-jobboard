@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { CopilotChat } from "@/components/demo/copilot-chat";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Career Copilot | Atheniks Career Copilot",
-};
-
-export default function CopilotPage() {
-  return <CopilotChat />;
+export default function LegacyCopilotPage() {
+  redirect(paths.copilot);
 }

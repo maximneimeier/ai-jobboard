@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { DocumentPreview } from "@/components/landing/document-preview";
 import { generateDemoApplication } from "@/lib/demo/application";
 import { demoJobById } from "@/lib/demo/jobs";
+import { paths } from "@/lib/demo/paths";
 import { downloadApplicationPdf } from "@/lib/pdf";
 import { upsertApplication, useDemo } from "@/lib/demo/store";
 
@@ -101,7 +102,7 @@ export function ApplicationEditor({ jobId }: { jobId: string }) {
             Job not found.
           </h1>
           <Link
-            href="/konto/gemerkt"
+            href={paths.saved}
             className="mt-6 inline-flex h-10 items-center rounded-md px-4 text-[14px] font-medium text-ink ring-1 ring-hairline"
           >
             Back to saved jobs
@@ -120,7 +121,7 @@ export function ApplicationEditor({ jobId }: { jobId: string }) {
         <div className="no-print flex flex-wrap items-start justify-between gap-4">
           <div>
             <Link
-              href="/konto/gemerkt"
+              href={paths.saved}
               className="text-[13px] font-medium tracking-[-0.16px] text-ink"
             >
               Back to saved jobs

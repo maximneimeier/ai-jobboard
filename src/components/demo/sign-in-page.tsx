@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { completeSignup } from "@/lib/demo/store";
+import { paths } from "@/lib/demo/paths";
+import { completeSignIn } from "@/lib/demo/store";
 
 export function SignInPage() {
   const [email, setEmail] = useState("");
@@ -10,8 +11,8 @@ export function SignInPage() {
   const [busy, setBusy] = useState(false);
 
   function finish() {
-    completeSignup(email.trim() || "alex@gmail.com");
-    window.location.assign("/konto");
+    completeSignIn(email.trim() || "alex@gmail.com");
+    window.location.assign(paths.account);
   }
 
   function onSubmit(event: FormEvent) {
@@ -66,7 +67,7 @@ export function SignInPage() {
       </form>
       <p className="mt-6 text-[14px] text-body">
         New here?{" "}
-        <Link href="/signup" className="font-medium text-ink underline">
+        <Link href={paths.signup} className="font-medium text-ink underline">
           Create an account
         </Link>
       </p>

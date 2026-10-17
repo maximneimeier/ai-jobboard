@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { paths } from "@/lib/demo/paths";
 import { upsertApplication, useDemo } from "@/lib/demo/store";
 
 export function PreparePanel({
@@ -65,7 +66,7 @@ export function PreparePanel({
             type="button"
             onClick={() => {
               upsertApplication(jobId, { status: "preparing", notes });
-              window.location.assign(`/konto/gemerkt/${jobId}`);
+              window.location.assign(paths.savedJob(jobId));
             }}
             className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-[14px] text-white focus-visible:ring-2 focus-visible:ring-accent"
           >
@@ -75,7 +76,7 @@ export function PreparePanel({
             type="button"
             onClick={() => {
               upsertApplication(jobId, { status: "preparing", notes });
-              window.location.assign("/konto/bewerbungen");
+              window.location.assign(paths.applications);
             }}
             className="inline-flex h-10 items-center rounded-md px-4 text-[14px] ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-accent"
           >
@@ -85,7 +86,7 @@ export function PreparePanel({
             type="button"
             onClick={() => {
               upsertApplication(jobId, { status: "applied", notes });
-              window.location.assign("/konto/bewerbungen");
+              window.location.assign(paths.applications);
             }}
             className="inline-flex h-10 items-center rounded-md px-4 text-[14px] ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-accent"
           >

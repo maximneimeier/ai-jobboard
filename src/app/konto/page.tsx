@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { DashboardHome } from "@/components/demo/dashboard-home";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Account | Atheniks Career Copilot",
-};
-
-export default function KontoPage() {
-  return <DashboardHome />;
+export default function LegacyKontoPage() {
+  redirect(paths.account);
 }

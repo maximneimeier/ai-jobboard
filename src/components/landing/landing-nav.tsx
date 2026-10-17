@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { paths } from "@/lib/demo/paths";
 import { useDemo } from "@/lib/demo/store";
 import { Logo } from "./logo";
 
@@ -41,21 +42,21 @@ export function LandingNav() {
           <div className="hidden items-center justify-end gap-2 md:flex">
             {signedUp ? (
               <Link
-                href="/konto"
+                href={paths.account}
                 className="inline-flex h-9 items-center rounded-xl px-3.5 text-[14px] font-medium text-ink transition hover:bg-canvas"
               >
                 Account
               </Link>
             ) : (
               <Link
-                href="/signin"
+                href={paths.signin}
                 className="inline-flex h-9 items-center rounded-xl px-3.5 text-[14px] font-medium text-ink transition hover:bg-canvas"
               >
                 Sign In
               </Link>
             )}
             <Link
-              href="/signup"
+              href={paths.signup}
               className="inline-flex h-9 items-center rounded-xl bg-accent px-3.5 text-[14px] font-medium text-white transition hover:bg-accent-hover"
             >
               Get Started
@@ -85,12 +86,12 @@ export function LandingNav() {
                 </a>
               ))}
               {signedUp ? (
-                <Link href="/konto" className="text-[14px] font-medium" onClick={() => setOpen(false)}>
+                <Link href={paths.account} className="text-[14px] font-medium" onClick={() => setOpen(false)}>
                   Account
                 </Link>
               ) : (
                 <Link
-                  href="/signin"
+                  href={paths.signin}
                   className="text-[14px] font-medium"
                   onClick={() => setOpen(false)}
                 >
@@ -98,7 +99,7 @@ export function LandingNav() {
                 </Link>
               )}
               <Link
-                href="/signup"
+                href={paths.signup}
                 className="inline-flex h-10 items-center justify-center rounded-xl bg-accent text-[14px] font-medium text-white"
                 onClick={() => setOpen(false)}
               >

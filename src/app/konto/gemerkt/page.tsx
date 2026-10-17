@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { SavedBoard } from "@/components/demo/saved-board";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Saved | Atheniks Career Copilot",
-};
-
-export default function KontoSavedPage() {
-  return <SavedBoard />;
+export default function LegacySavedPage() {
+  redirect(paths.saved);
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { demoJobById } from "@/lib/demo/jobs";
 import { salaryLabel } from "@/lib/demo/match";
+import { paths } from "@/lib/demo/paths";
 import { toggleSave, useDemo } from "@/lib/demo/store";
 
 export function SavedBoard() {
@@ -38,13 +39,13 @@ export function SavedBoard() {
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link
-                    href={`/jobs/${job.id}`}
+                    href={paths.job(job.id)}
                     className="inline-flex h-9 items-center rounded-md px-3 text-[13px] ring-1 ring-hairline"
                   >
                     Open job
                   </Link>
                   <Link
-                    href={`/konto/gemerkt/${job.id}`}
+                    href={paths.savedJob(job.id)}
                     className="inline-flex h-9 items-center rounded-md bg-ink px-3 text-[13px] text-white"
                   >
                     Prepare application

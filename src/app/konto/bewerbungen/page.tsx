@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { ApplicationsBoard } from "@/components/demo/applications-board";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Applications | Atheniks Career Copilot",
-};
-
-export default function ApplicationsPage() {
-  return <ApplicationsBoard />;
+export default function LegacyApplicationsPage() {
+  redirect(paths.applications);
 }

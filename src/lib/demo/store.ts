@@ -133,6 +133,7 @@ export type DemoState = {
   applications: DemoApplication[];
   pendingSaveId: string | null;
   jobFeedback: JobFeedback[];
+  workspaceSeeded: boolean;
 };
 
 function newId(prefix: string) {
@@ -263,7 +264,7 @@ export const EMPTY_FILTERS: DemoFilters = {
   fits: [],
 };
 
-const STORAGE_KEY = "atheniks.demo.v2";
+const STORAGE_KEY = "atheniks.demo.v3";
 export const DEMO_EVENT = "atheniks-demo";
 
 export const INITIAL_STATE: DemoState = {
@@ -281,6 +282,7 @@ export const INITIAL_STATE: DemoState = {
   applications: [],
   pendingSaveId: null,
   jobFeedback: [],
+  workspaceSeeded: false,
 };
 
 let rawCache: string | null = null;
@@ -509,6 +511,7 @@ function parse(raw: string | null): DemoState {
               Boolean(item && typeof item.jobId === "string" && typeof item.action === "string"),
           )
         : [],
+      workspaceSeeded: Boolean(data.workspaceSeeded),
     };
   } catch {
     return INITIAL_STATE;
@@ -764,6 +767,90 @@ export function toggleSave(jobId: string) {
   return { needsSignup: false, saved: true };
 }
 
+const SEEDED_SAVED_IDS = [
+  "se-northline",
+  "se-helix",
+  "sse-northline",
+  "fe-lumen",
+  "fs-rivet",
+  "se-palisade",
+];
+
+function seededApplications(): DemoApplication[] {
+  const now = Date.now();
+  return [
+    {
+      jobId: "se-northline",
+      status: "preparing",
+      notes: "Tailor the resume toward TypeScript, React, and the hybrid Berlin setup.",
+      followUp: "2026-10-22",
+      cv: "",
+      letter: "",
+      updatedAt: now,
+    },
+    {
+      jobId: "se-helix",
+      status: "applied",
+      notes: "Sent resume and cover letter. Waiting on a first-round screen.",
+      followUp: "2026-10-28",
+      cv: "",
+      letter: "",
+      updatedAt: now - 86_400_000,
+    },
+    {
+      jobId: "sse-northline",
+      status: "interview",
+      notes: "Hiring manager conversation booked. Prepare product and mentoring examples.",
+      followUp: "2026-10-21",
+      cv: "",
+      letter: "",
+      updatedAt: now - 172_800_000,
+    },
+    {
+      jobId: "fe-lumen",
+      status: "interested",
+      notes: "Strong frontend overlap. Confirm the stack before applying.",
+      followUp: "",
+      cv: "",
+      letter: "",
+      updatedAt: now - 259_200_000,
+    },
+    {
+      jobId: "fs-rivet",
+      status: "applied",
+      notes: "Applied through the listing. Follow up if there is no reply next week.",
+      followUp: "2026-10-30",
+      cv: "",
+      letter: "",
+      updatedAt: now - 345_600_000,
+    },
+  ];
+}
+
+function workspaceSeed(current: DemoState): Partial<DemoState> {
+  const profile = syncProfile(current.profile ?? SAMPLE_PROFILE);
+  const pending = current.pendingSaveId;
+  const savedIds = current.savedIds.length
+    ? current.savedIds
+    : pending
+      ? [pending, ...SEEDED_SAVED_IDS.filter((id) => id !== pending)]
+      : SEEDED_SAVED_IDS;
+  return {
+    profile,
+    personalized: true,
+    roleTags: current.roleTags.length ? current.roleTags : profile.desiredRoles,
+    locationTags: current.locationTags.length
+      ? current.locationTags
+      : profile.desiredLocations,
+    query: current.query || profile.desiredRoles[0] || "Software Engineer",
+    location: current.location || profile.desiredLocations[0] || "Berlin",
+    savedIds,
+    applications: current.applications.length
+      ? current.applications
+      : seededApplications(),
+  };
+}
+
 export function completeSignup(email = "alex@gmail.com") {
   const current = load();
   const savedIds = current.pendingSaveId
@@ -774,6 +861,27 @@ export function completeSignup(email = "alex@gmail.com") {
     email,
     savedIds,
     pendingSaveId: null,
+  });
+}
+
+export function completeSignIn(email = "alex@gmail.com") {
+  const current = load();
+  const seeded = current.workspaceSeeded ? {} : workspaceSeed(current);
+  patch({
+    ...seeded,
+    signedUp: true,
+    email,
+    pendingSaveId: null,
+    workspaceSeeded: true,
+  });
+}
+
+export function ensureWorkspace() {
+  const current = load();
+  if (!current.signedUp || current.workspaceSeeded) return;
+  patch({
+    ...workspaceSeed(current),
+    workspaceSeeded: true,
   });
 }
 

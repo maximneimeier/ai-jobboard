@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { paths } from "@/lib/demo/paths";
 import { useDemo } from "@/lib/demo/store";
 import { Logo } from "./logo";
 
@@ -15,9 +16,9 @@ export function SiteNav() {
   const signedUp = ready && demo.signedUp;
   const saved = ready ? demo.savedIds.length : 0;
   const links = [
-    { href: "/jobs", label: "Jobs" },
+    { href: paths.jobs, label: "Jobs" },
     { href: "/#how-it-works", label: "How it works" },
-    { href: "/konto/gemerkt", label: "Saved" },
+    { href: paths.saved, label: "Saved" },
     { href: "/#pricing", label: "Pricing" },
   ];
 
@@ -48,7 +49,7 @@ export function SiteNav() {
         <div className="hidden items-center gap-2 lg:flex">
           {signedUp ? (
             <Link
-              href="/konto"
+              href={paths.account}
               className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
             >
               Account
@@ -56,13 +57,13 @@ export function SiteNav() {
           ) : (
             <>
               <Link
-                href="/signin"
+                href={paths.signin}
                 className="inline-flex h-9 items-center rounded-md px-3.5 text-[14px] font-medium tracking-[-0.16px] text-ink"
               >
                 Sign in
               </Link>
               <Link
-                href="/signup"
+                href={paths.signup}
                 className="inline-flex h-9 items-center rounded-md bg-ink px-3.5 text-[14px] font-medium tracking-[-0.16px] text-white"
               >
                 Create your profile
@@ -113,7 +114,7 @@ export function SiteNav() {
             ))}
             {signedUp ? (
               <Link
-                href="/konto"
+                href={paths.account}
                 className="text-[14px] font-medium"
                 onClick={() => setOpen(false)}
               >
@@ -122,14 +123,14 @@ export function SiteNav() {
             ) : (
               <>
                 <Link
-                  href="/signin"
+                  href={paths.signin}
                   className="text-[14px] font-medium"
                   onClick={() => setOpen(false)}
                 >
                   Sign in
                 </Link>
                 <Link
-                  href="/signup"
+                  href={paths.signup}
                   className="text-[14px] font-medium"
                   onClick={() => setOpen(false)}
                 >

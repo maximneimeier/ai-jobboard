@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { demoJobById } from "@/lib/demo/jobs";
 import { FIT_CLASS, FIT_LABEL, rankDemoJobs, salaryLabel } from "@/lib/demo/match";
+import { paths } from "@/lib/demo/paths";
 import { useDemo } from "@/lib/demo/store";
 import { DemoBanner } from "./demo-banner";
 
@@ -58,11 +59,11 @@ export function DashboardHome() {
               : "/jobs"
           }
         />
-        <Card label="Saved jobs" value={String(saved.length)} href="/konto/gemerkt" />
+        <Card label="Saved jobs" value={String(saved.length)} href={paths.saved} />
         <Card
           label="Applications in progress"
           value={String(inProgress.length)}
-          href="/konto/bewerbungen"
+          href={paths.applications}
         />
       </div>
 
@@ -115,18 +116,18 @@ export function DashboardHome() {
         <h2 className="text-[16px] font-medium text-ink">Next steps</h2>
         <ul className="mt-4 grid gap-2 text-[14px] text-body">
           <li>
-            <Link href="/konto/gemerkt" className="text-ink underline">
+            <Link href={paths.saved} className="text-ink underline">
               Review saved jobs
             </Link>
           </li>
           <li>
-            <Link href="/konto/profil" className="text-ink underline">
-              Complete your resume
+            <Link href={paths.profile} className="text-ink underline">
+              Review your profile
             </Link>
           </li>
           <li>
-            <Link href="/konto/bewerbungen" className="text-ink underline">
-              Prepare your first application
+            <Link href={paths.applications} className="text-ink underline">
+              Open your applications
             </Link>
           </li>
         </ul>

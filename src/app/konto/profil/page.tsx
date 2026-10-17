@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { CareerProfilePage } from "@/components/demo/career-profile";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Profile | Atheniks Career Copilot",
-};
-
-export default function KontoProfilPage() {
-  return <CareerProfilePage />;
+export default function LegacyProfilePage() {
+  redirect(paths.profile);
 }

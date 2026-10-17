@@ -1,14 +1,9 @@
-import type { Metadata } from "next";
-import { ApplicationEditor } from "@/components/demo/application-editor";
+import { redirect } from "next/navigation";
+import { paths } from "@/lib/demo/paths";
 
-export const metadata: Metadata = {
-  title: "Application | Atheniks Career Copilot",
-  description: "Resume and cover letter for a saved job.",
-};
-
-export default async function SavedApplicationRoute({
+export default async function LegacySavedApplicationRoute({
   params,
 }: PageProps<"/konto/gemerkt/[id]">) {
   const { id } = await params;
-  return <ApplicationEditor jobId={id} />;
+  redirect(paths.savedJob(id));
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { demoJobById } from "@/lib/demo/jobs";
+import { paths } from "@/lib/demo/paths";
 import {
   upsertApplication,
   useDemo,
@@ -94,13 +95,13 @@ export function ApplicationsBoard() {
               <p className="mt-1 text-[14px] text-body">{job.company}</p>
               <div className="mt-3 flex flex-wrap gap-3">
                 <Link
-                  href={`/jobs/${job.id}`}
+                  href={paths.job(job.id)}
                   className="inline-flex text-[13px] text-ink underline"
                 >
                   Open job
                 </Link>
                 <Link
-                  href={`/konto/gemerkt/${job.id}`}
+                  href={paths.savedJob(job.id)}
                   className="inline-flex text-[13px] text-ink underline"
                 >
                   Resume and cover letter
